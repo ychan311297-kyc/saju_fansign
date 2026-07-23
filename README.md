@@ -1,4 +1,4 @@
-# Saju True Bias Match 💗
+# 당신의 최애를 찾아보세요 💗
 
 팬사인회·이벤트 콘텐츠용 **사주 기반 진짜 최애 찾기 웹앱**입니다.
 
@@ -14,17 +14,7 @@
 
 ## 🌐 Live Website
 
-GitHub Pages를 켠 뒤 아래 주소로 접속합니다.
-
-```text
-https://<GitHub아이디>.github.io/<저장소이름>/
-```
-
-예시:
-
-```text
-https://ychan311297-kyc.github.io/saju_fansign/
-```
+👉 https://ychan311297-kyc.github.io/saju_fansign/
 
 ---
 

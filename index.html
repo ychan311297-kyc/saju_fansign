@@ -1,0 +1,2095 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>사주 궁합 아이돌 매칭</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Nanum+Myeongjo:wght@400;700;800&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* K-pop 아이돌 팔레트: 핫핑크 × 일렉트릭 퍼플 × 시안 */
+    --bg: #0e0a1f;
+    --panel: #1a1236;
+    --panel-2: #241a48;
+    --ink: #f3edff;
+    --ink-dim: #ab9fce;
+    --gold: #ff4d97;          /* primary 액센트(핫핑크) */
+    --gold-2: #8b5cf6;        /* 보조 액센트(퍼플) */
+    --gold-3: #22d3ee;        /* 포인트(시안) */
+    --gold-soft: #ff4d9733;
+    --grad: linear-gradient(135deg, #ff4d97 0%, #a855f7 55%, #7c6bff 100%);
+    --hair: #ffffff14;
+    --edge-pad: 18px;         /* 제보하기 박스·상단 텍스트 공통 좌우 패딩 */
+
+    --mok: #34e0a1;   /* 木 민트그린 */
+    --hwa: #ff6b7d;   /* 火 코랄레드 */
+    --to:  #ffc94d;   /* 土 옐로우골드 */
+    --geum:#d7dcf7;   /* 金 실버라벤더 */
+    --su:  #4aa8ff;   /* 水 브라이트블루 */
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1000px 620px at 6% -10%, #ff3d9a2e 0%, transparent 55%),
+      radial-gradient(900px 560px at 104% 2%, #7b5cff33 0%, transparent 55%),
+      radial-gradient(820px 560px at 58% 112%, #22d3ee1c 0%, transparent 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family:'Noto Sans KR', -apple-system, 'Malgun Gothic', sans-serif;
+    min-height:100vh;
+    line-height:1.6;
+  }
+  .wrap{max-width:760px; margin:0 auto; padding:56px 20px 90px;}
+
+  body::before{
+    content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
+    background-image:
+      linear-gradient(#ffffff0a 1px, transparent 1px),
+      linear-gradient(90deg, #ffffff0a 1px, transparent 1px);
+    background-size:42px 42px;
+    -webkit-mask-image:radial-gradient(120% 80% at 50% -6%, #000 0%, transparent 68%);
+    mask-image:radial-gradient(120% 80% at 50% -6%, #000 0%, transparent 68%);
+  }
+  .wrap{position:relative; z-index:1;}
+
+  .eyebrow{
+    font-size:12px; letter-spacing:.25em; color:var(--gold);
+    text-transform:uppercase; margin-bottom:14px; display:flex; align-items:center; gap:10px;
+    padding-left:var(--edge-pad); padding-right:var(--edge-pad);
+  }
+  .eyebrow::before{content:"";width:22px;height:2px;border-radius:2px;background:var(--grad);display:inline-block;}
+  .eyebrow::after{content:"✦"; color:var(--gold-3); margin-left:2px; animation:twinkle 1.8s ease-in-out infinite;}
+  @keyframes twinkle{ 0%,100%{opacity:.35; transform:scale(.8);} 50%{opacity:1; transform:scale(1.25);} }
+
+  h1{
+    font-family:'Jua', 'Noto Sans KR', sans-serif; font-weight:400;
+    font-size:clamp(31px,5.8vw,47px); margin:0 0 10px; letter-spacing:0; line-height:1.22;
+    background:linear-gradient(92deg,#ff5da2,#c07bff,#43e0f0,#ff5da2);
+    background-size:300% 100%;
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    animation:holo 6s linear infinite;
+    filter:drop-shadow(0 2px 12px #ff4d9755);
+  }
+  @keyframes holo{ to{ background-position:300% 50%; } }
+  @media (prefers-reduced-motion: reduce){ h1{ animation:none; } }
+  .sub{color:#d7cff0; font-size:15px; line-height:1.66; max-width:56ch; margin:0 0 36px;
+    padding-left:var(--edge-pad); padding-right:var(--edge-pad);
+    word-break:keep-all; overflow-wrap:break-word;} /* 한글은 어절 단위로 줄바꿈 */
+  .sub b{color:var(--ink); font-weight:700;}
+  .nowrap{white-space:nowrap;} /* 고유어구·수치가 줄 사이에서 쪼개지지 않게 */
+
+  .panel{
+    background:linear-gradient(180deg, var(--panel), var(--panel-2));
+    border:1px solid #ff4d9722; border-radius:16px; padding:28px;
+    margin-bottom:22px; box-shadow:0 24px 60px -34px #ff2e8a55, 0 8px 30px -20px #7b5cff44;
+  }
+
+  label{display:block; font-size:13px; color:var(--ink-dim); margin-bottom:8px;}
+  .row{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+  input#bdate{
+    width:100%; background:#170e2e; border:1px solid #ffffff22; color:var(--ink);
+    border-radius:8px; padding:11px 12px; font-size:15px; font-family:inherit;
+    letter-spacing:.08em;
+  }
+  input#bdate:focus{outline:none; border-color:var(--gold);}
+  input#bdate::placeholder{color:#6b5f96; letter-spacing:0;}
+
+  .toggle{display:flex; align-items:center; gap:8px; margin-top:10px; font-size:13px; color:var(--ink-dim);}
+  .toggle input{accent-color:var(--gold);}
+
+  button.calc{
+    margin-top:24px; width:100%; padding:17px 18px; border-radius:14px; border:none;
+    background:var(--grad); color:#fff; font-weight:700; font-size:16.5px;
+    font-family:'Noto Sans KR', -apple-system, 'Segoe UI', sans-serif; cursor:pointer; letter-spacing:.01em;
+    box-shadow:0 8px 22px -14px #ff4d9799;
+    transition:transform .13s cubic-bezier(.2,.8,.3,1), box-shadow .18s ease, filter .18s ease;
+  }
+  button.calc:hover{filter:brightness(1.04); box-shadow:0 12px 28px -14px #ff4d97b0;}
+  button.calc:active{transform:scale(.975); box-shadow:0 6px 16px -14px #ff4d9799;}
+
+  .hidden{display:none !important;}
+  .daymaster{
+    display:flex; align-items:center; gap:18px; padding:22px 24px;
+    border-radius:14px; border:1px solid #ff4d9726;
+    background:linear-gradient(120deg,#1e1440,#170e2e);
+    box-shadow:0 12px 34px -24px #ff2e8a66;
+  }
+  .dm-badge{
+    width:64px; height:64px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-family:'Nanum Myeongjo', serif; font-size:26px; font-weight:800; color:#170e2e; flex:none;
+  }
+  .dm-text .dm-title{font-family:'Nanum Myeongjo', serif; font-size:19px; font-weight:700; margin-bottom:4px;}
+  .dm-text .dm-desc{font-size:13px; color:var(--ink-dim);}
+
+  .elembar{display:flex; gap:6px; margin-top:16px;}
+  .elembar .seg{flex:1; height:8px; border-radius:5px; position:relative; opacity:.9;}
+  .elemlegend{display:flex; justify-content:space-between; margin-top:8px; font-size:11px; color:var(--ink-dim);}
+
+  h2.section-title{
+    font-family:'Jua', 'Noto Sans KR', sans-serif; font-size:23px; font-weight:400;
+    margin:38px 0 8px; display:flex; align-items:baseline; gap:10px; letter-spacing:.01em;
+  }
+  .tier-note{font-size:13px; color:var(--ink-dim); margin:0 0 30px;}
+
+  .tier{
+    border-left:2px solid var(--hair); padding-left:18px; margin-bottom:26px; position:relative;
+  }
+  .tier::before{
+    content:attr(data-n); position:absolute; left:-11px; top:0; width:20px; height:20px;
+    background:var(--bg); border:2px solid var(--gold); border-radius:50%;
+    font-size:10.5px; display:flex; align-items:center; justify-content:center; color:var(--gold); font-weight:700;
+  }
+  .tier-head{font-size:15px; font-weight:700; margin-bottom:3px;}
+  .tier-role{font-size:12.5px; color:var(--ink-dim); margin-bottom:12px;}
+  .chips{display:flex; flex-wrap:wrap; gap:8px;}
+  .chip{
+    display:inline-flex; align-items:center; gap:6px; padding:6px 12px 6px 8px;
+    border-radius:20px; background:#170e2e; border:1px solid #ffffff1c; font-size:13px;
+  }
+  .chip .dot{width:9px; height:9px; border-radius:50%; flex:none;}
+  .chip .grp{color:var(--ink-dim); font-size:11.5px;}
+
+  .share-row{display:flex; align-items:center; gap:14px; margin-top:34px; flex-wrap:wrap;}
+  .share-btn{
+    padding:12px 20px; border-radius:9px; border:1px solid var(--gold);
+    background:transparent; color:var(--gold); font-weight:400; font-size:15px;
+    font-family:'Jua', 'Noto Sans KR', sans-serif; cursor:pointer; letter-spacing:.02em;
+    transition:background .12s ease, color .12s ease, transform .12s ease;
+  }
+  .share-btn:hover{background:var(--grad); border-color:transparent; color:#fff;}
+  .share-btn:disabled{opacity:.5; cursor:default;}
+  .share-hint{font-size:12px; color:var(--ink-dim);}
+
+  select#bhour{
+    width:100%; background:#170e2e; border:1px solid #ffffff22; color:var(--ink);
+    border-radius:8px; padding:11px 12px; font-size:15px; font-family:inherit;
+    appearance:none; -webkit-appearance:none;
+    background-image:linear-gradient(45deg,transparent 50%,var(--ink-dim) 50%),linear-gradient(135deg,var(--ink-dim) 50%,transparent 50%);
+    background-position:calc(100% - 18px) 18px, calc(100% - 13px) 18px;
+    background-size:5px 5px, 5px 5px; background-repeat:no-repeat;
+  }
+  .toggle-note{margin-top:12px; font-size:12px; color:var(--ink-dim); line-height:1.5;}
+
+  .search-row{display:flex; align-items:flex-start; gap:12px; margin:0 0 14px;}
+  .search-wrap{flex:1; position:relative;}
+  input#groupSearch{
+    width:100%; background:#170e2e; border:1px solid #ffffff22; color:var(--ink);
+    border-radius:9px; padding:11px 13px; font-size:14px; font-family:inherit;
+  }
+  input#groupSearch:focus{outline:none; border-color:var(--gold);}
+  input#groupSearch::placeholder{color:#6b5f96;}
+  .search-results{
+    position:absolute; top:calc(100% + 6px); left:0; right:0; z-index:20;
+    background:#1a1236; border:1px solid #ff4d9733; border-radius:11px; padding:6px;
+    max-height:280px; overflow-y:auto; box-shadow:0 20px 50px -20px #000b;
+  }
+  .sr-item{
+    display:flex; align-items:center; gap:10px; padding:9px 11px; border-radius:8px;
+    cursor:pointer; font-size:13.5px; color:var(--ink);
+  }
+  .sr-item:hover, .sr-item.on{background:var(--gold-soft);}
+  .sr-item .sr-en{color:var(--ink-dim); font-size:12px;}
+  .sr-item .sr-meta{margin-left:auto; color:var(--ink-dim); font-size:11.5px;}
+  .sr-empty{padding:12px; color:var(--ink-dim); font-size:13px; text-align:center;}
+
+  .filter-row{display:flex; align-items:flex-start; gap:12px; margin:0 0 12px;}
+  .filter-label{font-size:12px; color:var(--ink-dim); margin:0; flex:none; letter-spacing:.02em; padding-top:10px; width:52px;}
+  .agency-btns{display:flex; flex-wrap:wrap; gap:8px; flex:1;}
+  .agbtn{
+    padding:9px 15px; border-radius:999px; cursor:pointer;
+    border:1px solid #ffffff1c; background:#170e2e; color:var(--ink-dim);
+    font-family:'Jua', 'Noto Sans KR', sans-serif; font-size:14px;
+    display:inline-flex; align-items:center; gap:7px; transition:all .14s ease;
+  }
+  .agbtn:hover{border-color:var(--gold-soft); color:var(--ink); transform:translateY(-1px);}
+  .agbtn.active{background:var(--grad); border-color:transparent; color:#fff; box-shadow:0 8px 20px -12px #ff4d97cc;}
+  .agbtn .agn{font-size:11px; opacity:.65;}
+  .agbtn.active .agn{opacity:.9;}
+  .subgroup-row{display:flex; align-items:center; gap:12px; margin:0 0 16px; animation:cardIn .35s ease forwards;}
+  select#groupFilter{
+    flex:1; background:#170e2e; border:1px solid #ffffff22; color:var(--ink);
+    border-radius:8px; padding:10px 12px; font-size:14px; font-family:inherit;
+    appearance:none; -webkit-appearance:none;
+    background-image:linear-gradient(45deg,transparent 50%,var(--ink-dim) 50%),linear-gradient(135deg,var(--ink-dim) 50%,transparent 50%);
+    background-position:calc(100% - 18px) 17px, calc(100% - 13px) 17px;
+    background-size:5px 5px, 5px 5px; background-repeat:no-repeat;
+  }
+  .gender-tabs{display:flex; gap:8px; margin:0 0 20px;}
+  .gtab{
+    flex:1; padding:11px 12px; border-radius:9px; cursor:pointer;
+    border:1px solid #ffffff1c; background:#170e2e; color:var(--ink-dim);
+    font-family:'Jua', 'Noto Sans KR', sans-serif; font-size:15px; font-weight:400;
+    transition:all .14s ease;
+  }
+  .gtab:hover{border-color:var(--gold-soft); color:var(--ink);}
+  .gtab.active{background:var(--grad); border-color:transparent; color:#fff; font-weight:700; box-shadow:0 8px 20px -12px #ff4d97cc;}
+
+  .sex-tabs{display:flex; gap:6px;}
+  .sexbtn{
+    flex:1; padding:10px 6px; border-radius:8px; cursor:pointer; white-space:nowrap;
+    border:1px solid #ffffff22; background:#170e2e; color:var(--ink-dim);
+    font-family:inherit; font-size:14px; transition:all .14s ease;
+  }
+  .sexbtn:hover{border-color:var(--gold-soft); color:var(--ink);}
+  .sexbtn.active{background:var(--grad); border-color:transparent; color:#fff; font-weight:700; box-shadow:0 8px 20px -12px #ff4d97cc;}
+
+  .rank-card{
+    display:flex; align-items:flex-start; gap:16px; padding:16px 18px;
+    border:1px solid #ffffff14; border-radius:14px; background:#170e2e; margin-bottom:12px;
+    opacity:0; transform:translateY(16px) scale(.98);
+    animation:cardIn .5s cubic-bezier(.2,.7,.3,1) forwards;
+    transition:transform .16s ease, border-color .16s ease, box-shadow .16s ease;
+  }
+  .rank-card:hover{
+    transform:translateY(-3px) scale(1.012);
+    border-color:#ff4d9766;
+    box-shadow:0 16px 40px -22px #ff2e8a99, 0 6px 22px -18px #7b5cff88;
+  }
+  @keyframes cardIn{ to{ opacity:1; transform:none; } }
+  @keyframes badgePulse{ 0%,100%{ box-shadow:0 6px 16px -8px #ff4d97cc, 0 0 0 0 #ff4d9766; } 50%{ box-shadow:0 6px 18px -8px #ff4d97ee, 0 0 0 6px #ff4d9700; } }
+  @media (prefers-reduced-motion: reduce){
+    .rank-card{ opacity:1; transform:none; animation:none; }
+    .rank-top .rank-num{ animation:none; }
+  }
+  .rank-num{
+    flex:none; width:38px; height:38px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Jua', 'Noto Sans KR', sans-serif; font-weight:400; font-size:18px;
+    background:var(--gold-soft); color:var(--gold); border:1px solid var(--gold);
+  }
+  .rank-top .rank-num{background:var(--grad); border-color:transparent; color:#fff; box-shadow:0 6px 16px -8px #ff4d97cc; animation:badgePulse 2.4s ease-in-out infinite;}
+  .rank-body{flex:1; min-width:0;}
+  .rank-name{font-size:16px; font-weight:700; display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+  .rank-name .grp{font-size:12px; color:var(--ink-dim); font-weight:400;}
+  .rank-name .pill{font-size:11.5px; color:var(--ink-dim); border:1px solid #ffffff1c; border-radius:20px; padding:2px 9px; display:inline-flex; align-items:center; gap:6px;}
+  .rank-meta{font-size:12.5px; color:var(--gold); margin:5px 0 6px;}
+  .rank-reason{font-size:13px; color:var(--ink-dim); line-height:1.55;}
+  .rank-report{margin-top:7px;}
+  .rep-link{background:none; border:none; padding:0; cursor:pointer; font:inherit;
+    font-size:11.5px; color:#7b7396; opacity:.85; transition:color .14s;}
+  .rep-link:hover{color:var(--gold); opacity:1; text-decoration:underline;}
+  .rank-score{flex:none; text-align:right; padding-top:2px;}
+  .rank-score .pct{font-family:'Jua', 'Noto Sans KR', sans-serif; font-size:26px; font-weight:400; color:var(--ink); line-height:1;}
+  .rank-score .pct-label{font-size:10.5px; color:var(--ink-dim); margin-top:3px;}
+  .dot{width:9px; height:9px; border-radius:50%; display:inline-block; flex:none;}
+
+  .more-btn{
+    width:100%; margin-top:6px; padding:12px; border-radius:9px;
+    border:1px solid #ffffff22; background:transparent; color:var(--ink-dim);
+    font-family:'Jua', 'Noto Sans KR', sans-serif; font-size:14.5px; cursor:pointer;
+  }
+  .more-btn:hover{border-color:var(--gold); color:var(--gold);}
+  .rank-rest{margin-top:6px;}
+  .rest-row{display:flex; align-items:center; gap:12px; padding:10px 6px; border-top:1px solid #ffffff10; font-size:13.5px;}
+  .rest-row .r-n{width:30px; text-align:right; color:var(--ink-dim); flex:none;}
+  .rest-row .r-name{flex:1; min-width:0;}
+  .rest-row .r-grp{color:var(--ink-dim); font-size:11.5px;}
+  .rest-row .r-rel{color:var(--ink-dim); font-size:11.5px;}
+  .rest-row .r-pct{color:var(--gold); font-size:12.5px; width:44px; text-align:right; flex:none;}
+
+  .report-banner{
+    display:flex; align-items:center; gap:14px; margin:0 0 22px; padding:14px var(--edge-pad);
+    border-radius:14px; border:1px solid #ff4d9733;
+    background:linear-gradient(120deg,#2a1247,#1a1236);
+    box-shadow:0 12px 34px -26px #ff2e8a88;
+  }
+  .rb-text{flex:1; font-size:13.5px; color:var(--ink); line-height:1.5;}
+  .rb-count{display:block; font-size:11.5px; color:var(--ink-dim); margin-top:2px;}
+  .rb-btn{
+    flex:none; padding:10px 16px; border-radius:999px; border:none; cursor:pointer;
+    background:var(--grad); color:#fff; font-family:'Jua','Noto Sans KR',sans-serif; font-size:14px;
+    box-shadow:0 8px 20px -12px #ff4d97cc;
+  }
+  .rb-btn:hover{filter:brightness(1.07);}
+
+  .modal-overlay{
+    position:fixed; inset:0; z-index:60; display:flex; align-items:center; justify-content:center;
+    background:#08061199; backdrop-filter:blur(3px); padding:20px;
+  }
+  .modal{
+    width:100%; max-width:440px; max-height:88vh; overflow-y:auto; position:relative;
+    background:linear-gradient(180deg,#211642,#171029); border:1px solid #ff4d9733;
+    border-radius:18px; padding:26px 24px; box-shadow:0 30px 80px -30px #000;
+    animation:cardIn .28s ease forwards;
+  }
+  .modal-x{position:absolute; top:14px; right:14px; width:30px; height:30px; border-radius:50%;
+    border:1px solid #ffffff1c; background:#170e2e; color:var(--ink-dim); cursor:pointer; font-size:13px;}
+  .modal-x:hover{color:var(--ink); border-color:var(--gold);}
+  .modal-title{font-family:'Jua','Noto Sans KR',sans-serif; font-size:21px; font-weight:400; margin:0 0 8px;}
+  .modal-intro{font-size:13.5px; color:var(--ink-dim); line-height:1.6; margin:0 0 16px;}
+  .m-label{display:block; font-size:12px; color:var(--ink-dim); margin:12px 0 5px;}
+  .req{color:var(--gold);}
+  .m-input{
+    width:100%; background:#170e2e; border:1px solid #ffffff22; color:var(--ink);
+    border-radius:9px; padding:10px 12px; font-size:14.5px; font-family:inherit; appearance:none;
+  }
+  .m-input:focus{outline:none; border-color:var(--gold);}
+  .m-input::placeholder{color:#6b5f96;}
+  .m-row{display:flex; gap:12px;}
+  .hp{position:absolute; left:-9999px; width:1px; height:1px; opacity:0;}
+  .m-submit{
+    width:100%; margin-top:18px; padding:13px; border-radius:10px; border:none; cursor:pointer;
+    background:var(--grad); color:#fff; font-family:'Jua','Noto Sans KR',sans-serif; font-size:16px;
+    box-shadow:0 10px 26px -12px #ff4d97aa;
+  }
+  .m-submit:hover{filter:brightness(1.06);}
+  .m-submit:disabled{opacity:.5; cursor:default; filter:none;}
+  .m-note{font-size:11.5px; color:var(--ink-dim); text-align:center; margin:12px 0 0; line-height:1.5;}
+  .m-err{color:var(--hwa); font-size:12.5px; margin:10px 0 0; text-align:center;}
+  .m-done{font-size:44px; text-align:center; margin:8px 0 4px;}
+  .m-done-msg{font-size:15px; color:var(--ink); text-align:center; line-height:1.6; margin:0 0 4px;}
+  .up-list{margin:4px 0 6px;}
+  .up-item{display:flex; gap:10px; padding:10px 12px; border-radius:10px; background:#170e2e;
+    border:1px solid #ffffff12; margin-bottom:8px; font-size:13.5px;}
+  .up-item .up-date{color:var(--gold); flex:none; font-size:12.5px;}
+  .up-item .up-text{color:var(--ink);}
+
+  .fav-eyebrow{font-size:12px; letter-spacing:.08em; color:var(--gold); margin-bottom:6px;}
+  .fav-card{margin:6px 0 14px; padding:18px 18px 20px; border-radius:14px;
+    background:linear-gradient(160deg,#2a1550,#1a1030); border:1px solid #ff4d9733;
+    box-shadow:0 14px 40px -24px #ff4d97;}
+  .fav-name{font-size:24px; font-weight:800; line-height:1.25;
+    background:linear-gradient(90deg,#ff7ac3,#a98bff,#6fe0ff); -webkit-background-clip:text;
+    background-clip:text; -webkit-text-fill-color:transparent;}
+  .fav-role{font-size:13px; color:var(--gold); margin:4px 0 10px;}
+  .fav-reason{font-size:13.5px; color:var(--ink); line-height:1.6;}
+  .fav-foot{font-size:12.5px; color:var(--ink-dim); margin:0 0 14px;}
+
+  .disclaimer{
+    margin-top:44px; padding:20px 22px; border-radius:12px;
+    background:#170e2e; border:1px dashed #ffffff26; font-size:12.5px; color:var(--ink-dim);
+  }
+  .disclaimer h3{margin:0 0 10px; font-size:13px; color:var(--ink); font-weight:700;}
+  .disclaimer ul{margin:0; padding-left:18px;}
+  .disclaimer li{margin-bottom:6px;}
+
+  footer{margin-top:30px; font-size:11.5px; color:#5c6390; text-align:center;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">오행 상생상극 · 궁합 매칭</div>
+  <h1>사주 궁합 아이돌 매칭</h1>
+  <p class="sub"><b>내 사주랑 제일 잘 맞는 아이돌은 누구일까?</b> 🔮<br>
+  생년월일(·태어난 시각·성별)만 있으면 매일 늘어나는 <b class="nowrap"><span id="groupCount">91</span>개 그룹 · 총 <span id="idolCount">555</span>명</b> 중에서 오행 상생상극·지지(地支) 궁합, 그리고 <b class="nowrap">‘이성 인연’</b>까지 따져 당신의 <span class="nowrap">‘덕질 최애’</span>를 순위로 찾아드려요. 사전 정보 없이 순수 사주로만.</p>
+
+  <div class="report-banner" id="reportBanner">
+    <div class="rb-text">매일 새로운 인물을 모으고 있어요. 보고 싶은 사람, 살짝 알려줄래요? 👀</div>
+    <button class="rb-btn" onclick="openSuggest()">제보하기</button>
+  </div>
+
+  <div class="panel">
+    <div class="row">
+      <div>
+        <label for="bdate">생년월일 (8자리 숫자)</label>
+        <input type="tel" id="bdate" inputmode="numeric" pattern="[0-9]*" maxlength="8" placeholder="예: 19950719" autocomplete="off">
+      </div>
+      <div>
+        <label for="bhour">태어난 시각 (선택 · 24시간 기준)</label>
+        <select id="bhour"></select>
+      </div>
+      <div>
+        <label>내 성별 (선택)</label>
+        <input type="hidden" id="bsex" value="">
+        <div class="sex-tabs" id="sexTabs">
+          <button type="button" class="sexbtn active" data-s="" onclick="selectSex(this)">미선택</button>
+          <button type="button" class="sexbtn" data-s="F" onclick="selectSex(this)">여성</button>
+          <button type="button" class="sexbtn" data-s="M" onclick="selectSex(this)">남성</button>
+        </div>
+      </div>
+    </div>
+    <div class="toggle-note">시각을 입력하면 당신의 <b>시지(時支)</b>까지 궁합에 반영돼 순위가 더 정교해집니다. '모름'을 고르면 태어난 날짜(일간·일지)만으로 안정적으로 계산합니다. <b>성별</b>을 고르면 명리의 '이성 인연' 십신(남성=재성 · 여성=관성)을 살짝 더 반영해 순위·해석이 달라집니다. 미선택 시 성별 중립으로 계산합니다.</div>
+    <button class="calc" onclick="runCalc()">내 최애 찾기</button>
+  </div>
+
+  <div id="result" class="hidden">
+
+    <div class="daymaster">
+      <div class="dm-badge" id="dmBadge">辛</div>
+      <div class="dm-text">
+        <div class="dm-title" id="dmTitle">일간: 辛(신) · 금(金)</div>
+        <div class="dm-desc" id="dmDesc">일주(日柱): 辛亥</div>
+      </div>
+    </div>
+
+    <div class="elembar" id="elembar"></div>
+    <div class="elemlegend">
+      <span>木</span><span>火</span><span>土</span><span>金</span><span>水</span>
+    </div>
+
+    <h2 class="section-title">당신에게 추천하는 덕질 아이돌</h2>
+    <p class="tier-note">일간 기준 <b>십신 10신(정/편)</b>·<b>천간합</b>·<b>지장간</b>·<b>일지/년지(띠)/월지 궁합</b>을 합산하고, <b>당신의 신강·신약(身強身弱)</b>에 따라 가중치를 개인화해 <b>소수점 둘째 자리</b>까지 점수화한 순위입니다. 그래서 같은 아이돌도 사람마다 점수가 달라집니다. 태어난 시각을 넣으면 <b>시지(時支) 궁합</b>까지 반영됩니다. 아이돌에 대한 사전 정보 없이 <b>오로지 사주 특성만으로</b> 선정했습니다.</p>
+
+    <div class="filter-row" id="catRow" style="display:none">
+      <label class="filter-label">카테고리</label>
+      <div class="agency-btns" id="catBtns"></div>
+    </div>
+
+    <div class="search-row">
+      <label class="filter-label" for="groupSearch">검색</label>
+      <div class="search-wrap">
+        <input type="text" id="groupSearch" placeholder="그룹 검색 (한글·영문, 일부만 입력해도 됩니다)" autocomplete="off">
+        <div id="searchResults" class="search-results hidden"></div>
+      </div>
+    </div>
+
+    <div class="filter-row">
+      <label class="filter-label">소속사</label>
+      <div class="agency-btns" id="agencyBtns"></div>
+    </div>
+    <div class="subgroup-row" id="subgroupRow" style="display:none">
+      <label class="filter-label" for="groupFilter">그룹</label>
+      <select id="groupFilter" onchange="onGroupChange(this)"></select>
+    </div>
+
+    <div class="gender-tabs" id="genderTabs">
+      <button class="gtab active" data-g="F" onclick="switchGender('F')">여자 아이돌</button>
+      <button class="gtab" data-g="M" onclick="switchGender('M')">남자 아이돌</button>
+    </div>
+
+    <div id="ranklist"></div>
+    <div id="rankRest" class="rank-rest hidden"></div>
+    <button class="more-btn" id="moreBtn" onclick="toggleRest()">전체 순위 펼쳐보기</button>
+
+    <div class="share-row">
+      <button class="share-btn" id="shareBtn" onclick="shareResult()">결과 이미지 저장 · 공유</button>
+      <span class="share-hint" id="shareHint"></span>
+    </div>
+
+    <div class="disclaimer">
+      <h3>읽기 전 확인</h3>
+      <ul>
+        <li>사주 명리학은 전통 해석 체계이며 과학적으로 검증된 사실이 아닙니다.</li>
+        <li>"아이돌 궁합" 적용은 정통 명리학의 표준 기법이 아니라 오행 십신론을 유비적으로 확장한 오락적 해석입니다.</li>
+        <li>일간(日干)·일지(日支)는 태어난 날짜만으로 정확히 결정됩니다. 시각(24시간 기준)을 '모름'으로 두면 이 둘만으로 계산하고, 시각을 입력하면 <b>당신의 시지(時支)</b>와의 궁합이 가중치 0.6으로 추가되어 순위가 조금 달라집니다. 아이돌 측은 생일만 공개되어 일주(日柱)만 사용합니다.</li>
+        <li>순위 점수는 <b>일간 기준 십신 10신(비견·겁재·식신·상관·편재·정재·편관·정관·편인·정인) + 천간합 + 일지 지지 관계(육합·삼합·방합·충·해·비화) (+시각 입력 시 시지 관계)</b>를 합산해 0~100으로 정규화하고 소수 둘째 자리까지 표기합니다. '덕질 = 내가 애정을 쏟는 관계'로 보아 식상·인성을 상위에 둔 해석이며, 개인별 신강·신약(용신)은 반영하지 않은 단순화 기준입니다 — 확인필요.</li>
+        <li>수록된 아이돌 약 540명의 생년월일은 공개 출처(위키 등)를 기준으로 수집했고, 일주(日柱) 계산은 서로 다른 2가지 방식으로 교차검증했습니다. 다만 생년월일 자체는 소속사 발표와 실제가 다른 사례가 보고된 바 있고 신인·해외 멤버는 오차 가능성이 있어, 개별 확인이 필요할 수 있습니다.</li>
+        <li>같은 활동명을 쓰는 서로 다른 인물이 있어(예: 여러 그룹의 '지수'·'하니'), 이름 옆 소속 그룹으로 구분됩니다.</li>
+      </ul>
+    </div>
+  </div>
+
+  <footer>모든 계산은 브라우저 내에서만 실행되며 입력한 생년월일은 서버로 전송되지 않습니다.</footer>
+</div>
+
+<!-- 제보 모달 -->
+<div class="modal-overlay hidden" id="suggestModal" onclick="if(event.target===this)closeSuggest()">
+  <div class="modal">
+    <button class="modal-x" onclick="closeSuggest()" aria-label="닫기">✕</button>
+    <h3 class="modal-title">누구를 추가할까요? ✦</h3>
+    <p class="modal-intro">추가되길 원하는 아이돌·인물을 알려주세요. <b>이름과 그룹만 알아도 돼요</b> — 생년월일은 저희가 확인해서 반영할게요. <b>한 명만 알려줘도 그 사람이 속한 그룹 전체</b>를 함께 찾아 추가해드려요. (실존 인물만 가능해요.)</p>
+    <div id="suggestForm">
+      <label class="m-label">이름 <span class="req">*</span></label>
+      <input type="text" id="sgName" class="m-input" maxlength="40" placeholder="예: 하츠네" autocomplete="off">
+      <label class="m-label">그룹 / 소속 <span class="req">*</span></label>
+      <input type="text" id="sgGroup" class="m-input" maxlength="40" placeholder="예: NewJeans (솔로·배우면 그대로)" autocomplete="off">
+      <div class="m-row">
+        <div style="flex:1">
+          <label class="m-label">카테고리</label>
+          <select id="sgCat" class="m-input">
+            <option value="K-idol">한국 아이돌</option>
+            <option value="J-idol">일본 아이돌</option>
+            <option value="C-actor">중국 배우</option>
+            <option value="US-actor">미국 배우</option>
+            <option value="Etc">기타 (위에 없는 경우)</option>
+          </select>
+        </div>
+        <div style="flex:1">
+          <label class="m-label">성별</label>
+          <select id="sgGender" class="m-input">
+            <option value="">모름</option><option value="F">여</option><option value="M">남</option>
+          </select>
+        </div>
+      </div>
+      <label class="m-label">양력 생년월일 (알면 좋아요)</label>
+      <input type="tel" id="sgDob" class="m-input" inputmode="numeric" maxlength="8" placeholder="예: 20040507 · 모르면 비워두세요" autocomplete="off">
+      <label class="m-label">한마디 (선택)</label>
+      <input type="text" id="sgNote" class="m-input" maxlength="80" placeholder="소속사·추천 이유 등" autocomplete="off">
+      <input type="text" id="sgHp" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <button class="m-submit" id="sgSubmit" onclick="submitSuggest()">제보 보내기</button>
+      <p class="m-note">스팸 방지를 위해 1시간에 1번 제보할 수 있어요. 제보자 개인정보는 받지 않아요.</p>
+    </div>
+    <div id="suggestDone" class="hidden">
+      <div class="m-done">🎉</div>
+      <p class="m-done-msg" id="sgDoneMsg">고마워요! 잘 받았어요.<br>그룹 전체를 함께 찾아 오늘 밤 우선으로 챙길게요.</p>
+      <button class="m-submit" onclick="closeSuggest()">닫기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 오류 제보 모달 -->
+<div class="modal-overlay hidden" id="errorModal" onclick="if(event.target===this)closeError()">
+  <div class="modal">
+    <button class="modal-x" onclick="closeError()" aria-label="닫기">✕</button>
+    <h3 class="modal-title">정보가 틀렸나요? 🛠️</h3>
+    <p class="modal-intro"><b id="erTarget">이름 · 그룹</b>의 정보에 오류가 있으면 알려주세요. 확인해서 바로잡을게요. <b>올바른 값·출처</b>를 함께 적어주시면 훨씬 빨라요.</p>
+    <div id="erForm">
+      <label class="m-label">무엇이 틀렸나요? <span class="req">*</span></label>
+      <select id="erField" class="m-input">
+        <option value="생년월일">생년월일(생일)</option>
+        <option value="활동명">활동명(이름)</option>
+        <option value="소속 그룹">소속 그룹</option>
+        <option value="성별">성별</option>
+        <option value="비실존·중복">비실존 인물 · 중복</option>
+        <option value="기타">기타</option>
+      </select>
+      <label class="m-label">올바른 값 (알면 적어주세요)</label>
+      <input type="text" id="erSuggest" class="m-input" maxlength="60" placeholder="예: 19990507 · 올바른 활동명 등" autocomplete="off">
+      <label class="m-label">근거·출처 (권장)</label>
+      <input type="text" id="erNote" class="m-input" maxlength="120" placeholder="예: 공식 프로필·위키 등 확인할 수 있는 곳" autocomplete="off">
+      <input type="text" id="erHp" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <button class="m-submit" id="erSubmit" onclick="submitError()">오류 신고 보내기</button>
+      <p class="m-note">스팸 방지를 위해 1시간에 1번 제보할 수 있어요. 제보자 개인정보는 받지 않아요.</p>
+    </div>
+    <div id="erDone" class="hidden">
+      <div class="m-done">🛠️</div>
+      <p class="m-done-msg">고마워요! 잘 받았어요.<br>교차 확인해서 맞으면 바로잡을게요.</p>
+      <button class="m-submit" onclick="closeError()">닫기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 주간 최애 리포트 팝업 -->
+<div class="modal-overlay hidden" id="favReport" onclick="if(event.target===this)closeFav()">
+  <div class="modal">
+    <button class="modal-x" onclick="closeFav()" aria-label="닫기">✕</button>
+    <div class="fav-eyebrow">💌 이번 주 최애 리포트</div>
+    <h3 class="modal-title" id="favTitle">이번 주, 사주가 콕 집은 최애 ✨</h3>
+    <p class="modal-intro" id="favLead"></p>
+    <div class="fav-card">
+      <div class="fav-name" id="favName"></div>
+      <div class="fav-role" id="favRole"></div>
+      <div class="fav-reason" id="favReason"></div>
+    </div>
+    <p class="fav-foot" id="favFoot"></p>
+    <button class="m-submit" onclick="closeFav()">한 번 더 매칭하기</button>
+  </div>
+</div>
+
+<!-- 업데이트 팝업 -->
+<div class="modal-overlay hidden" id="updatePopup" onclick="if(event.target===this)closeUpdate()">
+  <div class="modal">
+    <button class="modal-x" onclick="closeUpdate()" aria-label="닫기">✕</button>
+    <h3 class="modal-title" id="upTitle">따끈한 새 얼굴이 왔어요 ✨</h3>
+    <p class="modal-intro" id="upLead"></p>
+    <div id="upList" class="up-list"></div>
+    <button class="m-submit" onclick="closeUpdate()">다시 매칭해보기</button>
+  </div>
+</div>
+
+<script>
+const STEMS = ["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"];
+const STEMS_KR = ["갑","을","병","정","무","기","경","신","임","계"];
+const BRANCHES = ["子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"];
+const ELEM_NAMES = ["木","火","土","金","水"];
+const ELEM_KR = ["목","화","토","금","수"];
+const ELEM_COLOR = {"木":"var(--mok)","火":"var(--hwa)","土":"var(--to)","金":"var(--geum)","水":"var(--su)"};
+const ELEM_HEX = {"木":"#34e0a1","火":"#ff6b7d","土":"#ffc94d","金":"#d7dcf7","水":"#4aa8ff"};
+const STEM_ELEM_IDX = [0,0,1,1,2,2,3,3,4,4];
+
+const GEN_ORDER = ["木","火","土","金","水"];
+const CTRL_ORDER = ["木","土","水","火","金"];
+
+// 성별 분류 (그룹 기준). 목록에 없는 그룹은 여성으로 처리.
+const MALE_GROUPS = new Set(["SEVENTEEN","BTS","EXO","Stray Kids","TXT","ENHYPEN","NCT","SHINee","WINNER"]);
+
+// 대형소속사 분류 (그룹 기준). 목록에 없는 그룹은 '기타'로 처리.
+const AGENCY_ORDER = ["HYBE","SM","YG","JYP","기타"];
+const GROUP_AGENCY = {
+  "BTS":"HYBE","SEVENTEEN":"HYBE","TXT":"HYBE","ENHYPEN":"HYBE","르세라핌":"HYBE","NewJeans":"HYBE","ILLIT":"HYBE",
+  "EXO":"SM","Red Velvet":"SM","aespa":"SM","NCT":"SM","SNSD":"SM","SHINee":"SM",
+  "BLACKPINK":"YG","WINNER":"YG",
+  "TWICE":"JYP","Stray Kids":"JYP","ITZY":"JYP","NMIXX":"JYP",
+  "IVE":"기타","(G)I-DLE":"기타","솔로":"기타","MAMAMOO":"기타"
+};
+const agencyOf = (g)=> GROUP_AGENCY[g] || "기타";
+
+// 그룹 한글명 ↔ 영문명 (데이터의 group 값 → {ko, en}). 검색·표시에 병기.
+const GROUP_NAMES = {
+  "SEVENTEEN":{ko:"세븐틴",en:"SEVENTEEN"},"BTS":{ko:"방탄소년단",en:"BTS"},"BLACKPINK":{ko:"블랙핑크",en:"BLACKPINK"},
+  "EXO":{ko:"엑소",en:"EXO"},"솔로":{ko:"솔로",en:"Solo"},"SNSD":{ko:"소녀시대",en:"Girls' Generation"},
+  "IVE":{ko:"아이브",en:"IVE"},"aespa":{ko:"에스파",en:"aespa"},"르세라핌":{ko:"르세라핌",en:"LE SSERAFIM"},
+  "ITZY":{ko:"있지",en:"ITZY"},"Stray Kids":{ko:"스트레이 키즈",en:"Stray Kids"},"NewJeans":{ko:"뉴진스",en:"NewJeans"},
+  "(G)I-DLE":{ko:"(여자)아이들",en:"(G)I-DLE"},"TWICE":{ko:"트와이스",en:"TWICE"},"Red Velvet":{ko:"레드벨벳",en:"Red Velvet"},
+  "TXT":{ko:"투모로우바이투게더",en:"TXT"},"ENHYPEN":{ko:"엔하이픈",en:"ENHYPEN"},"NCT":{ko:"엔시티",en:"NCT"},
+  "SHINee":{ko:"샤이니",en:"SHINee"},"WINNER":{ko:"위너",en:"WINNER"},"MAMAMOO":{ko:"마마무",en:"MAMAMOO"},
+  "ILLIT":{ko:"아일릿",en:"ILLIT"},"NMIXX":{ko:"엔믹스",en:"NMIXX"},"Super Junior":{ko:"슈퍼주니어",en:"Super Junior"},
+  "RIIZE":{ko:"라이즈",en:"RIIZE"},"TVXQ":{ko:"동방신기",en:"TVXQ"},"BIGBANG":{ko:"빅뱅",en:"BIGBANG"},
+  "iKON":{ko:"아이콘",en:"iKON"},"TREASURE":{ko:"트레저",en:"TREASURE"},"BABYMONSTER":{ko:"베이비몬스터",en:"BABYMONSTER"},
+  "2NE1":{ko:"투애니원",en:"2NE1"},"AKMU":{ko:"악뮤",en:"AKMU"},"GOT7":{ko:"갓세븐",en:"GOT7"},
+  "2PM":{ko:"투피엠",en:"2PM"},"DAY6":{ko:"데이식스",en:"DAY6"},"NiziU":{ko:"니쥬",en:"NiziU"},
+  "&TEAM":{ko:"앤팀",en:"&TEAM"},"BOYNEXTDOOR":{ko:"보이넥스트도어",en:"BOYNEXTDOOR"},"TWS":{ko:"투어스",en:"TWS"},
+  "fromis_9":{ko:"프로미스나인",en:"fromis_9"},"STAYC":{ko:"스테이씨",en:"STAYC"},"Kep1er":{ko:"케플러",en:"Kep1er"},
+  "ATEEZ":{ko:"에이티즈",en:"ATEEZ"},"THE BOYZ":{ko:"더보이즈",en:"THE BOYZ"},"MONSTA X":{ko:"몬스타엑스",en:"MONSTA X"},
+  "PENTAGON":{ko:"펜타곤",en:"PENTAGON"},"BTOB":{ko:"비투비",en:"BTOB"},"Golden Child":{ko:"골든차일드",en:"Golden Child"},
+  "INFINITE":{ko:"인피니트",en:"INFINITE"},"ASTRO":{ko:"아스트로",en:"ASTRO"},"ONEUS":{ko:"원어스",en:"ONEUS"},
+  "VICTON":{ko:"빅톤",en:"VICTON"},"CRAVITY":{ko:"크래비티",en:"CRAVITY"},"SF9":{ko:"에스에프나인",en:"SF9"},
+  "P1Harmony":{ko:"피원하모니",en:"P1Harmony"},"Highlight":{ko:"하이라이트",en:"Highlight"},"CIX":{ko:"씨아이엑스",en:"CIX"},
+  "ZEROBASEONE":{ko:"제로베이스원",en:"ZEROBASEONE"},"OH MY GIRL":{ko:"오마이걸",en:"OH MY GIRL"},"Apink":{ko:"에이핑크",en:"Apink"},
+  "WJSN":{ko:"우주소녀",en:"WJSN"},"Girl's Day":{ko:"걸스데이",en:"Girl's Day"},"KARA":{ko:"카라",en:"KARA"},
+  "Wonder Girls":{ko:"원더걸스",en:"Wonder Girls"},"T-ara":{ko:"티아라",en:"T-ara"},"tripleS":{ko:"트리플에스",en:"tripleS"},
+  "Billlie":{ko:"빌리",en:"Billlie"},"QWER":{ko:"큐더블유이알",en:"QWER"},"LIGHTSUM":{ko:"라잇썸",en:"LIGHTSUM"},
+  "KISS OF LIFE":{ko:"키스오브라이프",en:"KISS OF LIFE"},"VIVIZ":{ko:"비비지",en:"VIVIZ"},"Weeekly":{ko:"위클리",en:"Weeekly"},
+  "GFRIEND":{ko:"여자친구",en:"GFRIEND"},"Lovelyz":{ko:"러블리즈",en:"Lovelyz"},"EXID":{ko:"이엑스아이디",en:"EXID"},
+  "LOONA":{ko:"이달의 소녀",en:"LOONA"},"Rocket Punch":{ko:"로켓펀치",en:"Rocket Punch"},"VERIVERY":{ko:"베리베리",en:"VERIVERY"},
+  "ONF":{ko:"온앤오프",en:"ONF"},"TEMPEST":{ko:"템페스트",en:"TEMPEST"},"DKZ":{ko:"디케이지",en:"DKZ"},
+  "워너원":{ko:"워너원",en:"Wanna One"},"Xdinary Heroes":{ko:"엑스디너리 히어로즈",en:"Xdinary Heroes"}
+};
+// 그룹 표시명: "한글 (영문)". 한글=영문이면 하나만.
+function groupLabel(g){
+  const n=GROUP_NAMES[g];
+  if(!n) return g;
+  return (n.ko===n.en) ? n.ko : `${n.ko} (${n.en})`;
+}
+
+// 십신(十神) 10신 — 일간 기준 상대 천간을 음양(정/편)까지 구분해 세분화한 '덕질 궁합' 가중치.
+// 덕질 = 내가 애정을 쏟는 관계 → 식상·인성을 상위로 두되, 정/편으로 더 잘게 나눠 동점을 줄인다.
+const STEM_YY = i => (i%2===0 ? 1 : 0); // 甲丙戊庚壬=양, 乙丁己辛癸=음
+const GODS = {
+  "상관":{h:"傷官", w:40, fam:"식상", role:"애정을 쏟는 최애형", reason:"내 기운이 자유롭게 뻗어 나가는 관계라, 재능을 응원하고 표현을 즐기는 덕질에 최적이에요."},
+  "식신":{h:"食神", w:38, fam:"식상", role:"애정을 쏟는 최애형", reason:"내 기운이 온화하게 흘러가는 관계라, 편안히 챙겨주고 아끼는 덕질에 잘 맞아요."},
+  "정인":{h:"正印", w:33, fam:"인성", role:"힐링·충전형", reason:"나를 자애롭게 보살펴 주는 관계라, 보고만 있어도 위로받고 충전돼요."},
+  "편인":{h:"偏印", w:30, fam:"인성", role:"힐링·충전형", reason:"나를 특별한 방식으로 채워 주는 관계라, 묘하게 끌리며 힐링돼요."},
+  "정재":{h:"正財", w:24, fam:"재성", role:"설레는 매력형", reason:"내가 안정적으로 끌어당기는 관계라, 곁에 두고 싶은 든든한 매력이에요."},
+  "편재":{h:"偏財", w:22, fam:"재성", role:"설레는 매력형", reason:"내가 화려하게 끌어당기는 관계라, 설레고 눈을 뗄 수 없는 매력이에요."},
+  "겁재":{h:"劫財", w:15, fam:"비겁", role:"편안한 친구형", reason:"기운은 같지만 결이 달라, 톡톡 튀는 친구 같은 편안함이 있어요."},
+  "비견":{h:"比肩", w:13, fam:"비겁", role:"편안한 친구형", reason:"나와 같은 기운이라, 동질감이 큰 편한 상대예요."},
+  "정관":{h:"正官", w:8,  fam:"관성", role:"긴장·경외형", reason:"나를 절제 있게 이끄는 관계라, 멋있지만 조금 어렵게 느껴질 수 있어요."},
+  "편관":{h:"偏官", w:6,  fam:"관성", role:"긴장·경외형", reason:"나를 강하게 압박하는 관계라, 카리스마는 크지만 부담이 될 수 있어요."}
+};
+function godName(uSI, tSI){
+  const ue=ELEM_NAMES[STEM_ELEM_IDX[uSI]], te=ELEM_NAMES[STEM_ELEM_IDX[tSI]];
+  const same = STEM_YY(uSI)===STEM_YY(tSI);
+  if(te===ue) return same?"비견":"겁재";
+  if(generates(ue,te)) return same?"식신":"상관";
+  if(generates(te,ue)) return same?"편인":"정인";
+  if(controls(ue,te)) return same?"편재":"정재";
+  return same?"편관":"정관";
+}
+function tenGod(uSI, tSI){ const n=godName(uSI,tSI); return {name:n, ...GODS[n]}; }
+// 천간합(天干合): 甲己·乙庚·丙辛·丁壬·戊癸 — 일간끼리 합하면 특별한 인연 가점
+function ganHap(uSI,tSI){ return (uSI+5)%10===tSI; }
+
+// 지장간(支藏干) 정기(본기) — 지지 index별 대표 천간 index
+const JIJANG=[9,5,0,1,4,2,3,5,6,7,4,8]; // 子癸 丑己 寅甲 卯乙 辰戊 巳丙 午丁 未己 申庚 酉辛 戌戊 亥壬
+// 절기 근사: 각 월 節(월 시작)의 대략적 시작일
+const TERM_DAY={1:6,2:4,3:6,4:5,5:6,6:6,7:7,8:8,9:8,10:8,11:7,12:7};
+function yearPillar(y,m,d){ let yy=y; if(m<2||(m===2&&d<4)) yy=y-1; return {stemIdx:mod(yy-4,10), branchIdx:mod(yy-4,12)}; }
+function monthPillar(y,m,d,yearStemIdx){
+  const bIdx = (d>=TERM_DAY[m]) ? (m%12) : ((m%12+11)%12); // 절기 근사로 월지 결정
+  const inStem = ((yearStemIdx%5)*2+2)%10;                 // 오호둔: 寅월 천간
+  return {stemIdx:mod(inStem + mod(bIdx-2,12), 10), branchIdx:bIdx};
+}
+// 신강/신약: 일간을 돕는 세력(비겁·인성) vs 빼는 세력(식상·재성·관성).
+// 억부론에 맞춰 일간(日干) 자신은 기준점이라 세력 계산에서 제외하고, 나머지 글자만 센다.
+// need>0 = 신약(도움 필요), need<0 = 신강(설기 필요). 범위 대략 [-0.4, 0.4].
+function bodyStrength(pillars, dayElem){
+  let support=0, total=0;
+  pillars.forEach(({stem, branch, weight, isDay})=>{
+    // 일간 자신(일주의 천간)은 제외, 일지(지지)는 세력으로 포함
+    const glyphs = isDay
+      ? [ELEM_NAMES[STEM_ELEM_IDX[JIJANG[branch]]]]
+      : [ELEM_NAMES[STEM_ELEM_IDX[stem]], ELEM_NAMES[STEM_ELEM_IDX[JIJANG[branch]]]];
+    glyphs.forEach(E=>{
+      total += weight;
+      if(E===dayElem || generates(E, dayElem)) support += weight; // 비겁·인성 = 도움
+    });
+  });
+  const r = total ? support/total : 0.5;
+  return Math.max(-0.4, Math.min(0.4, 0.5 - r));
+}
+const FAM_DIR = {식상:-1, 재성:-1, 관성:-1, 인성:1, 비겁:1}; // 신약(need>0)일 때 인성·비겁 가점
+
+// 일지(日支) 관계 — 지지 인덱스(子0 … 亥11) 기준
+const LIUHE  = {0:1,1:0,2:11,11:2,3:10,10:3,4:9,9:4,5:8,8:5,6:7,7:6}; // 육합
+const SANHE  = [[8,0,4],[11,3,7],[2,6,10],[5,9,1]];                   // 삼합(申子辰·亥卯未·寅午戌·巳酉丑)
+const BANGHE = [[2,3,4],[5,6,7],[8,9,10],[11,0,1]];                   // 방합
+const HAE    = {0:7,7:0,1:6,6:1,2:5,5:2,3:4,4:3,8:11,11:8,9:10,10:9}; // 육해
+function branchRel(a,b){
+  if(a===b)                return {score:4,  tag:"일지 비화(比和)", reason:"일지가 같아 결이 비슷해요."};
+  if((a+6)%12===b)         return {score:-14,tag:"일지 충(沖)",     reason:"일지가 정반대라 애증이 오갈 수 있어요."};
+  if(LIUHE[a]===b)         return {score:14, tag:"일지 육합(六合)", reason:"일지가 서로 딱 맞물리는 찰떡 인연이에요."};
+  if(SANHE.some(g=>g.includes(a)&&g.includes(b)))
+                           return {score:11, tag:"일지 삼합(三合)", reason:"같은 기운으로 뭉치는 삼합이라 함께할수록 시너지가 나요."};
+  if(HAE[a]===b)           return {score:-6, tag:"일지 해(害)",     reason:"사소하게 엇갈리는 지점이 생길 수 있어요."};
+  if(BANGHE.some(g=>g.includes(a)&&g.includes(b)))
+                           return {score:6,  tag:"일지 방합(方合)", reason:"같은 계절 기운끼리 모여 무난하게 어울려요."};
+  return {score:0, tag:"일지 평(平)", reason:""};
+}
+
+const IDOLS = [
+  ["에스쿱스","SEVENTEEN","辛未","金","M","HYBE","19950808","K-idol"],
+  ["정한","SEVENTEEN","戊辰","土","M","HYBE","19951004","K-idol"],
+  ["조슈아","SEVENTEEN","乙未","木","M","HYBE","19951230","K-idol"],
+  ["준","SEVENTEEN","戊寅","土","M","HYBE","19960610","K-idol"],
+  ["호시","SEVENTEEN","癸未","水","M","HYBE","19960615","K-idol"],
+  ["원우","SEVENTEEN","乙卯","木","M","HYBE","19960717","K-idol"],
+  ["우지","SEVENTEEN","癸亥","水","M","HYBE","19961122","K-idol"],
+  ["도겸","SEVENTEEN","辛卯","金","M","HYBE","19970218","K-idol"],
+  ["민규","SEVENTEEN","戊寅","土","M","HYBE","19970406","K-idol"],
+  ["디에잇","SEVENTEEN","癸丑","水","M","HYBE","19971107","K-idol"],
+  ["승관","SEVENTEEN","癸亥","水","M","HYBE","19980116","K-idol"],
+  ["버논","SEVENTEEN","丙申","火","M","HYBE","19980218","K-idol"],
+  ["디노","SEVENTEEN","甲午","木","M","HYBE","19990211","K-idol"],
+  ["RM","BTS","辛丑","金","M","HYBE","19940912","K-idol"],
+  ["진","BTS","甲寅","木","M","HYBE","19921204","K-idol"],
+  ["슈가","BTS","己丑","土","M","HYBE","19930309","K-idol"],
+  ["제이홉","BTS","乙亥","木","M","HYBE","19940218","K-idol"],
+  ["지민","BTS","丁丑","火","M","HYBE","19951013","K-idol"],
+  ["뷔","BTS","乙未","木","M","HYBE","19951230","K-idol"],
+  ["정국","BTS","丙午","火","M","HYBE","19970901","K-idol"],
+  ["지수","BLACKPINK","甲午","木","F","YG","19950103","K-idol"],
+  ["제니","BLACKPINK","壬子","水","F","YG","19960116","K-idol"],
+  ["로제","BLACKPINK","甲申","木","F","YG","19970211","K-idol"],
+  ["리사","BLACKPINK","戊辰","土","F","YG","19970327","K-idol"],
+  ["장원영","IVE","壬午","水","F","기타","20040831","K-idol"],
+  ["안유진","IVE","丁丑","火","F","기타","20030901","K-idol"],
+  ["카리나","aespa","己亥","土","F","SM","20000411","K-idol"],
+  ["윈터","aespa","甲子","木","F","SM","20010101","K-idol"],
+  ["닝닝","aespa","甲子","木","F","SM","20021023","K-idol"],
+  ["카즈하","르세라핌","甲寅","木","F","HYBE","20030809","K-idol"],
+  ["사쿠라","르세라핌","乙丑","木","F","HYBE","19980319","K-idol"],
+  ["지젤","aespa","辛酉","金","F","SM","20001030","K-idol"],
+  ["가을","IVE","乙未","木","F","기타","20020924","K-idol"],
+  ["레이","IVE","壬子","水","F","기타","20040203","K-idol"],
+  ["리즈","IVE","甲辰","木","F","기타","20041121","K-idol"],
+  ["이서","IVE","丙戌","火","F","기타","20070221","K-idol"],
+  ["김채원","르세라핌","辛卯","金","F","HYBE","20000801","K-idol"],
+  ["허윤진","르세라핌","甲辰","木","F","HYBE","20011008","K-idol"],
+  ["홍은채","르세라핌","癸卯","水","F","HYBE","20061110","K-idol"],
+  ["민지","NewJeans","丙戌","火","F","HYBE","20040507","K-idol"],
+  ["하니","NewJeans","戊午","土","F","HYBE","20041006","K-idol"],
+  ["다니엘","NewJeans","乙丑","木","F","HYBE","20050411","K-idol"],
+  ["해린","NewJeans","甲辰","木","F","HYBE","20060515","K-idol"],
+  ["혜인","NewJeans","辛卯","金","F","HYBE","20080421","K-idol"],
+  ["미연","(G)I-DLE","癸酉","水","F","기타","19970131","K-idol"],
+  ["민니","(G)I-DLE","戊戌","土","F","기타","19971023","K-idol"],
+  ["소연","(G)I-DLE","乙巳","木","F","기타","19980826","K-idol"],
+  ["우기","(G)I-DLE","戊寅","土","F","기타","19990923","K-idol"],
+  ["슈화","(G)I-DLE","癸亥","水","F","기타","20000106","K-idol"],
+  ["나연","TWICE","丙辰","火","F","JYP","19950922","K-idol"],
+  ["정연","TWICE","壬寅","水","F","JYP","19961101","K-idol"],
+  ["모모","TWICE","庚戌","金","F","JYP","19961109","K-idol"],
+  ["사나","TWICE","庚子","金","F","JYP","19961229","K-idol"],
+  ["지효","TWICE","甲戌","木","F","JYP","19970201","K-idol"],
+  ["미나","TWICE","乙丑","木","F","JYP","19970324","K-idol"],
+  ["다현","TWICE","乙亥","木","F","JYP","19980528","K-idol"],
+  ["채영","TWICE","乙巳","木","F","JYP","19990423","K-idol"],
+  ["쯔위","TWICE","丁酉","火","F","JYP","19990614","K-idol"],
+  ["아이린","Red Velvet","戊戌","土","F","SM","19910329","K-idol"],
+  ["슬기","Red Velvet","丁卯","火","F","SM","19940210","K-idol"],
+  ["웬디","Red Velvet","戊寅","土","F","SM","19940221","K-idol"],
+  ["조이","Red Velvet","癸卯","水","F","SM","19960903","K-idol"],
+  ["예리","Red Velvet","丙辰","火","F","SM","19990305","K-idol"],
+  ["연준","TXT","戊辰","土","M","HYBE","19990913","K-idol"],
+  ["수빈","TXT","丁酉","火","M","HYBE","20001205","K-idol"],
+  ["범규","TXT","乙亥","木","M","HYBE","20010313","K-idol"],
+  ["태현","TXT","甲辰","木","M","HYBE","20020205","K-idol"],
+  ["휴닝카이","TXT","甲寅","木","M","HYBE","20020814","K-idol"],
+  ["희승","ENHYPEN","辛亥","金","M","HYBE","20011015","K-idol"],
+  ["제이","ENHYPEN","戊午","土","M","HYBE","20020420","K-idol"],
+  ["제이크","ENHYPEN","丁亥","火","M","HYBE","20021115","K-idol"],
+  ["성훈","ENHYPEN","庚戌","金","M","HYBE","20021208","K-idol"],
+  ["정원","ENHYPEN","戊午","土","M","HYBE","20040209","K-idol"],
+  ["선우","ENHYPEN","戊辰","土","M","HYBE","20030624","K-idol"],
+  ["니키","ENHYPEN","丁卯","火","M","HYBE","20051209","K-idol"],
+  ["온유","SHINee","戊申","土","M","SM","19891214","K-idol"],
+  ["키","SHINee","丙申","火","M","SM","19910923","K-idol"],
+  ["민호","SHINee","癸丑","水","M","SM","19911209","K-idol"],
+  ["태민","SHINee","庚子","金","M","SM","19930718","K-idol"],
+  ["김진우","WINNER","己亥","土","M","YG","19910926","K-idol"],
+  ["이승훈","WINNER","丙戌","火","M","YG","19920111","K-idol"],
+  ["송민호","WINNER","庚戌","金","M","YG","19930330","K-idol"],
+  ["강승윤","WINNER","丁未","火","M","YG","19940121","K-idol"],
+  ["솔라","MAMAMOO","壬戌","水","F","기타","19910221","K-idol"],
+  ["문별","MAMAMOO","壬申","水","F","기타","19921222","K-idol"],
+  ["휘인","MAMAMOO","戊寅","土","F","기타","19950417","K-idol"],
+  ["화사","MAMAMOO","乙卯","木","F","기타","19950723","K-idol"],
+  ["윤아","ILLIT","己卯","土","F","HYBE","20041027","K-idol"],
+  ["민주","ILLIT","丁酉","火","F","HYBE","20040518","K-idol"],
+  ["모카","ILLIT","辛巳","金","F","HYBE","20040701","K-idol"],
+  ["원희","ILLIT","己丑","土","F","HYBE","20070425","K-idol"],
+  ["이로하","ILLIT","壬申","水","F","HYBE","20080731","K-idol"],
+  ["지드래곤","BIGBANG","乙巳","木","M","YG","19880818","K-idol"],
+  ["태양","BIGBANG","癸酉","水","M","YG","19880518","K-idol"],
+  ["대성","BIGBANG","丙辰","火","M","YG","19890426","K-idol"],
+  ["김진환","iKON","甲子","木","M","YG","19940207","K-idol"],
+  ["송윤형","iKON","庚午","金","M","YG","19950208","K-idol"],
+  ["바비","iKON","丙戌","火","M","YG","19951221","K-idol"],
+  ["김동혁","iKON","乙巳","木","M","YG","19970103","K-idol"],
+  ["구준회","iKON","壬申","水","M","YG","19970331","K-idol"],
+  ["정찬우","iKON","癸酉","水","M","YG","19980126","K-idol"],
+  ["최현석","TREASURE","癸卯","水","M","YG","19990421","K-idol"],
+  ["지훈","TREASURE","辛未","金","M","YG","20000314","K-idol"],
+  ["요시","TREASURE","癸酉","水","M","YG","20000515","K-idol"],
+  ["준규","TREASURE","庚午","金","M","YG","20000909","K-idol"],
+  ["윤재혁","TREASURE","丁亥","火","M","YG","20010723","K-idol"],
+  ["아사히","TREASURE","乙卯","木","M","YG","20010820","K-idol"],
+  ["도영","TREASURE","辛亥","金","M","YG","20031204","K-idol"],
+  ["하루토","TREASURE","甲寅","木","M","YG","20040405","K-idol"],
+  ["박정우","TREASURE","庚戌","金","M","YG","20040928","K-idol"],
+  ["소정환","TREASURE","癸酉","水","M","YG","20050218","K-idol"],
+  ["제이비","GOT7","壬辰","水","M","JYP","19940106","K-idol"],
+  ["마크","GOT7","戊子","土","M","JYP","19930904","K-idol"],
+  ["잭슨","GOT7","癸丑","水","M","JYP","19940328","K-idol"],
+  ["진영","GOT7","辛亥","金","M","JYP","19940922","K-idol"],
+  ["영재","GOT7","丁巳","火","M","JYP","19960917","K-idol"],
+  ["뱀뱀","GOT7","甲辰","木","M","JYP","19970502","K-idol"],
+  ["유겸","GOT7","癸亥","水","M","JYP","19971117","K-idol"],
+  ["준케이","2PM","己巳","土","M","JYP","19880115","K-idol"],
+  ["닉쿤","2PM","庚戌","金","M","JYP","19880624","K-idol"],
+  ["택연","2PM","丙辰","火","M","JYP","19881227","K-idol"],
+  ["우영","2PM","庚申","金","M","JYP","19890430","K-idol"],
+  ["준호","2PM","庚寅","金","M","JYP","19900125","K-idol"],
+  ["찬성","2PM","丁未","火","M","JYP","19900211","K-idol"],
+  ["성진","DAY6","辛卯","金","M","JYP","19920116","K-idol"],
+  ["영케이","DAY6","甲戌","木","M","JYP","19931219","K-idol"],
+  ["원필","DAY6","甲申","木","M","JYP","19940428","K-idol"],
+  ["도운","DAY6","戊子","土","M","JYP","19950825","K-idol"],
+  ["방찬","Stray Kids","戊寅","土","M","JYP","19971003","K-idol"],
+  ["리노","Stray Kids","乙巳","木","M","JYP","19981025","K-idol"],
+  ["창빈","Stray Kids","乙未","木","M","JYP","19990811","K-idol"],
+  ["현진","Stray Kids","丁丑","火","M","JYP","20000320","K-idol"],
+  ["한","Stray Kids","乙亥","木","M","JYP","20000914","K-idol"],
+  ["필릭스","Stray Kids","丙子","火","M","JYP","20000915","K-idol"],
+  ["승민","Stray Kids","癸未","水","M","JYP","20000922","K-idol"],
+  ["아이엔","Stray Kids","壬寅","水","M","JYP","20010208","K-idol"],
+  ["예지","ITZY","甲申","木","F","JYP","20000526","K-idol"],
+  ["리아","ITZY","庚辰","金","F","JYP","20000721","K-idol"],
+  ["류진","ITZY","庚戌","金","F","JYP","20010417","K-idol"],
+  ["채령","ITZY","己亥","土","F","JYP","20010605","K-idol"],
+  ["유나","ITZY","丙辰","火","F","JYP","20031209","K-idol"],
+  ["릴리","NMIXX","戊午","土","F","JYP","20021017","K-idol"],
+  ["해원","NMIXX","己巳","土","F","JYP","20030225","K-idol"],
+  ["설윤","NMIXX","甲辰","木","F","JYP","20040126","K-idol"],
+  ["배이","NMIXX","辛巳","金","F","JYP","20041228","K-idol"],
+  ["지우","NMIXX","丁卯","火","F","JYP","20050413","K-idol"],
+  ["규진","NMIXX","乙卯","木","F","JYP","20060526","K-idol"],
+  ["마코","NiziU","丁酉","火","F","JYP","20010404","K-idol"],
+  ["리오","NiziU","癸卯","水","F","JYP","20020204","K-idol"],
+  ["마야","NiziU","丙午","火","F","JYP","20020408","K-idol"],
+  ["리쿠","NiziU","丁卯","火","F","JYP","20021026","K-idol"],
+  ["아야카","NiziU","甲子","木","F","JYP","20030620","K-idol"],
+  ["마유카","NiziU","庚寅","金","F","JYP","20031113","K-idol"],
+  ["리마","NiziU","甲辰","木","F","JYP","20040326","K-idol"],
+  ["미이히","NiziU","癸亥","水","F","JYP","20040812","K-idol"],
+  ["니나","NiziU","壬午","水","F","JYP","20050227","K-idol"],
+  ["케이","&TEAM","丙申","火","M","HYBE","19971021","K-idol"],
+  ["후마","&TEAM","丁未","火","M","HYBE","19980629","K-idol"],
+  ["니콜라스","&TEAM","戊寅","土","M","HYBE","20020709","K-idol"],
+  ["이제이","&TEAM","戊寅","土","M","HYBE","20020907","K-idol"],
+  ["유마","&TEAM","丙辰","火","M","HYBE","20040207","K-idol"],
+  ["조","&TEAM","戊子","土","M","HYBE","20040708","K-idol"],
+  ["하루아","&TEAM","乙酉","木","M","HYBE","20050501","K-idol"],
+  ["타키","&TEAM","戊子","土","M","HYBE","20050504","K-idol"],
+  ["마키","&TEAM","丁丑","火","M","HYBE","20060217","K-idol"],
+  ["성호","BOYNEXTDOOR","庚辰","金","M","HYBE","20030904","K-idol"],
+  ["리우","BOYNEXTDOOR","戊辰","土","M","HYBE","20031022","K-idol"],
+  ["재현","BOYNEXTDOOR","辛亥","金","M","HYBE","20031204","K-idol"],
+  ["태산","BOYNEXTDOOR","辛酉","金","M","HYBE","20040810","K-idol"],
+  ["이한","BOYNEXTDOOR","壬申","水","M","HYBE","20041020","K-idol"],
+  ["운학","BOYNEXTDOOR","壬戌","水","M","HYBE","20061129","K-idol"],
+  ["신유","TWS","甲申","木","M","HYBE","20031107","K-idol"],
+  ["도훈","TWS","甲寅","木","M","HYBE","20050130","K-idol"],
+  ["영재","TWS","乙卯","木","M","HYBE","20050531","K-idol"],
+  ["한진","TWS","甲午","木","M","HYBE","20060105","K-idol"],
+  ["지훈","TWS","丙辰","火","M","HYBE","20060328","K-idol"],
+  ["경민","TWS","己巳","土","M","HYBE","20071002","K-idol"],
+  ["송하영","fromis_9","甲戌","木","F","HYBE","19970929","K-idol"],
+  ["박지원","fromis_9","丙寅","火","F","HYBE","19980320","K-idol"],
+  ["이채영","fromis_9","壬申","水","F","HYBE","20000514","K-idol"],
+  ["이나경","fromis_9","庚寅","金","F","HYBE","20000601","K-idol"],
+  ["백지헌","fromis_9","庚申","金","F","HYBE","20030417","K-idol"],
+  ["수민","STAYC","乙亥","木","F","기타","20010313","K-idol"],
+  ["시은","STAYC","丙申","火","F","기타","20010801","K-idol"],
+  ["아이사","STAYC","辛卯","金","F","기타","20020123","K-idol"],
+  ["세은","STAYC","戊午","土","F","기타","20030614","K-idol"],
+  ["윤","STAYC","癸亥","水","F","기타","20040414","K-idol"],
+  ["재이","STAYC","壬戌","水","F","기타","20041209","K-idol"],
+  ["최유진","Kep1er","辛巳","金","F","기타","19960812","K-idol"],
+  ["샤오팅","Kep1er","戊辰","土","F","기타","19991112","K-idol"],
+  ["김채현","Kep1er","甲子","木","F","기타","20020426","K-idol"],
+  ["김다연","Kep1er","甲戌","木","F","기타","20030302","K-idol"],
+  ["히카루","Kep1er","庚寅","金","F","기타","20040312","K-idol"],
+  ["휴닝바히에","Kep1er","丁未","火","F","기타","20040727","K-idol"],
+  ["홍중","ATEEZ","戊午","土","M","기타","19981107","K-idol"],
+  ["성화","ATEEZ","庚辰","金","M","기타","19980403","K-idol"],
+  ["윤호","ATEEZ","乙亥","木","M","기타","19990324","K-idol"],
+  ["여상","ATEEZ","戊戌","土","M","기타","19990615","K-idol"],
+  ["산","ATEEZ","癸亥","水","M","기타","19990710","K-idol"],
+  ["민기","ATEEZ","癸巳","水","M","기타","19990809","K-idol"],
+  ["우영","ATEEZ","壬午","水","M","기타","19991126","K-idol"],
+  ["종호","ATEEZ","癸卯","水","M","기타","20001012","K-idol"],
+  ["상연","THE BOYZ","乙巳","木","M","기타","19961104","K-idol"],
+  ["제이콥","THE BOYZ","壬申","水","M","기타","19970530","K-idol"],
+  ["영훈","THE BOYZ","壬午","水","M","기타","19970808","K-idol"],
+  ["현재","THE BOYZ","戊午","土","M","기타","19970913","K-idol"],
+  ["주연","THE BOYZ","壬戌","水","M","기타","19980115","K-idol"],
+  ["케빈","THE BOYZ","辛丑","金","M","기타","19980223","K-idol"],
+  ["뉴","THE BOYZ","癸卯","水","M","기타","19980426","K-idol"],
+  ["큐","THE BOYZ","丙辰","火","M","기타","19981105","K-idol"],
+  ["선우","THE BOYZ","庚子","金","M","기타","20000412","K-idol"],
+  ["에릭","THE BOYZ","甲寅","木","M","기타","20001222","K-idol"],
+  ["셔누","MONSTA X","乙丑","木","M","기타","19920618","K-idol"],
+  ["민혁","MONSTA X","戊子","土","M","기타","19931103","K-idol"],
+  ["기현","MONSTA X","丁未","火","M","기타","19931122","K-idol"],
+  ["형원","MONSTA X","辛丑","金","M","기타","19940115","K-idol"],
+  ["주헌","MONSTA X","乙丑","木","M","기타","19941006","K-idol"],
+  ["아이엠","MONSTA X","壬戌","水","M","기타","19960126","K-idol"],
+  ["후이","PENTAGON","辛巳","金","M","기타","19930828","K-idol"],
+  ["진호","PENTAGON","癸亥","水","M","기타","19920417","K-idol"],
+  ["홍석","PENTAGON","癸酉","水","M","기타","19940417","K-idol"],
+  ["신원","PENTAGON","丙子","火","M","기타","19951211","K-idol"],
+  ["여원","PENTAGON","癸亥","水","M","기타","19960327","K-idol"],
+  ["옌안","PENTAGON","乙未","木","M","기타","19961025","K-idol"],
+  ["유토","PENTAGON","庚午","金","M","기타","19980123","K-idol"],
+  ["키노","PENTAGON","甲戌","木","M","기타","19980127","K-idol"],
+  ["우석","PENTAGON","戊寅","土","M","기타","19980131","K-idol"],
+  ["서은광","BTOB","辛卯","金","M","기타","19901122","K-idol"],
+  ["이민혁","BTOB","戊戌","土","M","기타","19901129","K-idol"],
+  ["이창섭","BTOB","丁卯","火","M","기타","19910226","K-idol"],
+  ["임현식","BTOB","壬午","水","M","기타","19920307","K-idol"],
+  ["프니엘","BTOB","庚寅","金","M","기타","19930310","K-idol"],
+  ["육성재","BTOB","癸巳","水","M","기타","19950502","K-idol"],
+  ["대열","Golden Child","癸亥","水","M","기타","19930211","K-idol"],
+  ["와이","Golden Child","癸亥","水","M","기타","19950731","K-idol"],
+  ["장준","Golden Child","甲辰","木","M","기타","19970303","K-idol"],
+  ["태그","Golden Child","庚寅","金","M","기타","19980413","K-idol"],
+  ["승민","Golden Child","癸巳","水","M","기타","19981013","K-idol"],
+  ["재현","Golden Child","丙辰","火","M","기타","19990104","K-idol"],
+  ["지범","Golden Child","丙戌","火","M","기타","19990203","K-idol"],
+  ["동현","Golden Child","丙午","火","M","기타","19990223","K-idol"],
+  ["주찬","Golden Child","甲申","木","M","기타","19990731","K-idol"],
+  ["보민","Golden Child","甲寅","木","M","기타","20000824","K-idol"],
+  ["성규","INFINITE","戊午","土","M","기타","19890428","K-idol"],
+  ["동우","INFINITE","辛卯","金","M","기타","19901122","K-idol"],
+  ["우현","INFINITE","己酉","土","M","기타","19910208","K-idol"],
+  ["성열","INFINITE","己巳","土","M","기타","19910827","K-idol"],
+  ["엘","INFINITE","戊子","土","M","기타","19920313","K-idol"],
+  ["성종","INFINITE","丁亥","火","M","기타","19930903","K-idol"],
+  ["엠제이","ASTRO","庚寅","金","M","기타","19940305","K-idol"],
+  ["진진","ASTRO","辛亥","金","M","기타","19960315","K-idol"],
+  ["차은우","ASTRO","辛未","金","M","기타","19970330","K-idol"],
+  ["산하","ASTRO","戊寅","土","M","기타","20000321","K-idol"],
+  ["서호","ONEUS","乙亥","木","M","기타","19960607","K-idol"],
+  ["이도","ONEUS","己巳","土","M","기타","19970726","K-idol"],
+  ["건희","ONEUS","乙巳","木","M","기타","19980627","K-idol"],
+  ["환웅","ONEUS","乙巳","木","M","기타","19980826","K-idol"],
+  ["시온","ONEUS","丁卯","火","M","기타","20000110","K-idol"],
+  ["승우","VICTON","甲申","木","M","기타","19941224","K-idol"],
+  ["승식","VICTON","丁丑","火","M","기타","19950416","K-idol"],
+  ["세준","VICTON","辛丑","金","M","기타","19960504","K-idol"],
+  ["한세","VICTON","庚午","金","M","기타","19970925","K-idol"],
+  ["병찬","VICTON","丙戌","火","M","기타","19991001","K-idol"],
+  ["수빈","VICTON","甲子","木","M","기타","20000705","K-idol"],
+  ["세림","CRAVITY","甲寅","木","M","기타","19990303","K-idol"],
+  ["앨런","CRAVITY","戊申","土","M","기타","19990426","K-idol"],
+  ["정모","CRAVITY","癸巳","水","M","기타","20000205","K-idol"],
+  ["우빈","CRAVITY","丁未","火","M","기타","20001016","K-idol"],
+  ["원진","CRAVITY","甲申","木","M","기타","20010322","K-idol"],
+  ["민희","CRAVITY","戊子","土","M","기타","20020917","K-idol"],
+  ["형준","CRAVITY","壬寅","水","M","기타","20021130","K-idol"],
+  ["태영","CRAVITY","庚子","金","M","기타","20030127","K-idol"],
+  ["성민","CRAVITY","丙午","火","M","기타","20030801","K-idol"],
+  ["영빈","SF9","戊申","土","M","기타","19931123","K-idol"],
+  ["인성","SF9","甲午","木","M","기타","19930712","K-idol"],
+  ["재윤","SF9","丁卯","火","M","기타","19940809","K-idol"],
+  ["다원","SF9","丙辰","火","M","기타","19950724","K-idol"],
+  ["주호","SF9","壬寅","水","M","기타","19960704","K-idol"],
+  ["유태양","SF9","辛丑","金","M","기타","19970228","K-idol"],
+  ["휘영","SF9","癸亥","水","M","기타","19990511","K-idol"],
+  ["찬희","SF9","甲戌","木","M","기타","20000117","K-idol"],
+  ["기호","P1Harmony","癸巳","水","M","기타","20010927","K-idol"],
+  ["테오","P1Harmony","乙丑","木","M","기타","20010701","K-idol"],
+  ["지웅","P1Harmony","癸卯","水","M","기타","20011007","K-idol"],
+  ["인탁","P1Harmony","丙子","火","M","기타","20030831","K-idol"],
+  ["소울","P1Harmony","丙辰","火","M","기타","20050201","K-idol"],
+  ["종섭","P1Harmony","丁未","火","M","기타","20051119","K-idol"],
+  ["윤두준","Highlight","乙丑","木","M","기타","19890704","K-idol"],
+  ["양요섭","Highlight","庚午","金","M","기타","19900105","K-idol"],
+  ["이기광","Highlight","甲午","木","M","기타","19900330","K-idol"],
+  ["손동운","Highlight","丁未","火","M","기타","19910606","K-idol"],
+  ["비엑스","CIX","辛亥","金","M","기타","19980305","K-idol"],
+  ["승훈","CIX","己酉","土","M","기타","19990226","K-idol"],
+  ["용희","CIX","乙巳","木","M","기타","20000217","K-idol"],
+  ["배진영","CIX","戊辰","土","M","기타","20000510","K-idol"],
+  ["현석","CIX","甲戌","木","M","기타","20010908","K-idol"],
+  ["성한빈","ZEROBASEONE","丁未","火","M","기타","20010613","K-idol"],
+  ["김지웅","ZEROBASEONE","乙未","木","M","기타","19981214","K-idol"],
+  ["석매튜","ZEROBASEONE","丙申","火","M","기타","20020528","K-idol"],
+  ["김태래","ZEROBASEONE","癸未","水","M","기타","20020714","K-idol"],
+  ["박건욱","ZEROBASEONE","甲午","木","M","기타","20050110","K-idol"],
+  ["효정","OH MY GIRL","乙卯","木","F","기타","19940728","K-idol"],
+  ["미미","OH MY GIRL","壬辰","水","F","기타","19950501","K-idol"],
+  ["유아","OH MY GIRL","辛亥","金","F","기타","19950917","K-idol"],
+  ["승희","OH MY GIRL","辛酉","金","F","기타","19960125","K-idol"],
+  ["비니","OH MY GIRL","甲寅","木","F","기타","19970909","K-idol"],
+  ["아린","OH MY GIRL","辛丑","金","F","기타","19990618","K-idol"],
+  ["초롱","Apink","壬申","水","F","기타","19910303","K-idol"],
+  ["보미","Apink","丙寅","火","F","기타","19930813","K-idol"],
+  ["은지","Apink","辛未","金","F","기타","19930818","K-idol"],
+  ["남주","Apink","丙子","火","F","기타","19950415","K-idol"],
+  ["하영","Apink","丁巳","火","F","기타","19960719","K-idol"],
+  ["설아","WJSN","甲申","木","F","기타","19941224","K-idol"],
+  ["보나","WJSN","壬午","水","F","기타","19950819","K-idol"],
+  ["엑시","WJSN","辛丑","金","F","기타","19951106","K-idol"],
+  ["수빈","WJSN","甲寅","木","F","기타","19960914","K-idol"],
+  ["루다","WJSN","丁未","火","F","기타","19970306","K-idol"],
+  ["다원","WJSN","戊子","土","F","기타","19970416","K-idol"],
+  ["은서","WJSN","甲戌","木","F","기타","19980527","K-idol"],
+  ["여름","WJSN","壬戌","水","F","기타","19990110","K-idol"],
+  ["다영","WJSN","丙寅","火","F","기타","19990514","K-idol"],
+  ["연정","WJSN","丁亥","火","F","기타","19990803","K-idol"],
+  ["소진","Girl's Day","乙丑","木","F","기타","19860521","K-idol"],
+  ["유라","Girl's Day","丙戌","火","F","기타","19921106","K-idol"],
+  ["민아","Girl's Day","甲午","木","F","기타","19930513","K-idol"],
+  ["혜리","Girl's Day","丙寅","火","F","기타","19940609","K-idol"],
+  ["규리","KARA","丙子","火","F","기타","19880521","K-idol"],
+  ["승연","KARA","庚辰","金","F","기타","19880724","K-idol"],
+  ["니콜","KARA","庚戌","金","F","기타","19911007","K-idol"],
+  ["지영","KARA","甲辰","木","F","기타","19940118","K-idol"],
+  ["영지","KARA","戊子","土","F","기타","19940830","K-idol"],
+  ["선예","Wonder Girls","甲辰","木","F","기타","19890812","K-idol"],
+  ["예은","Wonder Girls","丙戌","火","F","기타","19890526","K-idol"],
+  ["유빈","Wonder Girls","壬辰","水","F","기타","19881004","K-idol"],
+  ["혜림","Wonder Girls","庚辰","金","F","기타","19920901","K-idol"],
+  ["선미","Wonder Girls","戊寅","土","F","기타","19920502","K-idol"],
+  ["소희","Wonder Girls","甲戌","木","F","기타","19920627","K-idol"],
+  ["큐리","T-ara","庚寅","金","F","기타","19861212","K-idol"],
+  ["은정","T-ara","辛丑","金","F","기타","19881212","K-idol"],
+  ["소연","T-ara","丁亥","火","F","기타","19871005","K-idol"],
+  ["보람","T-ara","乙丑","木","F","기타","19860322","K-idol"],
+  ["지연","T-ara","己未","土","F","기타","19930607","K-idol"],
+  ["효민","T-ara","庚寅","金","F","기타","19890530","K-idol"],
+  ["아름","T-ara","乙亥","木","F","기타","19940419","K-idol"],
+  ["화영","T-ara","癸酉","水","F","기타","19930422","K-idol"],
+  ["줄리","KISS OF LIFE","丙戌","火","F","기타","20000329","K-idol"],
+  ["나띠","KISS OF LIFE","戊戌","土","F","기타","20020530","K-idol"],
+  ["벨","KISS OF LIFE","戊戌","土","F","기타","20040320","K-idol"],
+  ["하늘","KISS OF LIFE","己酉","土","F","기타","20050525","K-idol"],
+  ["은하","VIVIZ","壬申","水","F","기타","19970530","K-idol"],
+  ["신비","VIVIZ","辛巳","金","F","기타","19980603","K-idol"],
+  ["엄지","VIVIZ","戊戌","土","F","기타","19980819","K-idol"],
+  ["수진","Weeekly","己酉","土","F","기타","20011212","K-idol"],
+  ["먼데이","Weeekly","戊寅","土","F","기타","20020510","K-idol"],
+  ["소은","Weeekly","丁卯","火","F","기타","20021026","K-idol"],
+  ["재희","Weeekly","丙申","火","F","기타","20040318","K-idol"],
+  ["지한","Weeekly","壬辰","水","F","기타","20040712","K-idol"],
+  ["조아","Weeekly","乙卯","木","F","기타","20050531","K-idol"],
+  ["윤서연","tripleS","辛亥","金","F","기타","20030806","K-idol"],
+  ["정혜린","tripleS","丙子","火","F","기타","20070412","K-idol"],
+  ["이지우","tripleS","辛巳","金","F","기타","20051024","K-idol"],
+  ["김채연","tripleS","丁巳","火","F","기타","20041204","K-idol"],
+  ["김유연","tripleS","癸卯","水","F","기타","20010209","K-idol"],
+  ["김수민","tripleS","庚午","金","F","기타","20071003","K-idol"],
+  ["김나경","tripleS","甲寅","木","F","기타","20021013","K-idol"],
+  ["공유빈","tripleS","戊午","土","F","기타","20050203","K-idol"],
+  ["카에데","tripleS","戊寅","土","F","기타","20051220","K-idol"],
+  ["서다현","tripleS","辛巳","金","F","기타","20030108","K-idol"],
+  ["코토네","tripleS","戊子","土","F","기타","20040310","K-idol"],
+  ["곽연지","tripleS","丁未","火","F","기타","20080108","K-idol"],
+  ["니엔","tripleS","丙午","火","F","기타","20030602","K-idol"],
+  ["박소현","tripleS","甲寅","木","F","기타","20021013","K-idol"],
+  ["마유","tripleS","戊寅","土","F","기타","20020510","K-idol"],
+  ["린","tripleS","辛未","金","F","기타","20060412","K-idol"],
+  ["주빈","tripleS","辛酉","金","F","기타","20090116","K-idol"],
+  ["정하연","tripleS","丁卯","火","F","기타","20070801","K-idol"],
+  ["박시온","tripleS","壬戌","水","F","기타","20060403","K-idol"],
+  ["김채원","tripleS","丙申","火","F","기타","20070502","K-idol"],
+  ["설린","tripleS","癸亥","水","F","기타","20061130","K-idol"],
+  ["서아","tripleS","壬辰","水","F","기타","20100611","K-idol"],
+  ["문수아","Billlie","甲子","木","F","기타","19990909","K-idol"],
+  ["수현","Billlie","壬申","水","F","기타","20000115","K-idol"],
+  ["하람","Billlie","丙子","火","F","기타","20010113","K-idol"],
+  ["츠키","Billlie","壬辰","水","F","기타","20020921","K-idol"],
+  ["시온","Billlie","辛丑","金","F","기타","20030128","K-idol"],
+  ["시윤","Billlie","辛未","金","F","기타","20050216","K-idol"],
+  ["하루나","Billlie","己未","土","F","기타","20060130","K-idol"],
+  ["초단","QWER","壬子","水","F","기타","19981101","K-idol"],
+  ["마젠타","QWER","乙亥","木","F","기타","19970602","K-idol"],
+  ["시연","QWER","甲戌","木","F","기타","20000516","K-idol"],
+  ["히나","QWER","癸巳","水","F","기타","20010130","K-idol"],
+  ["상아","LIGHTSUM","乙亥","木","F","기타","20020904","K-idol"],
+  ["초원","LIGHTSUM","丁亥","火","F","기타","20020916","K-idol"],
+  ["나영","LIGHTSUM","壬寅","水","F","기타","20021130","K-idol"],
+  ["주현","LIGHTSUM","丁巳","火","F","기타","20040408","K-idol"],
+  ["유정","LIGHTSUM","甲子","木","F","기타","20040614","K-idol"],
+  ["소원","GFRIEND","壬申","水","F","기타","19951207","K-idol"],
+  ["예린","GFRIEND","戊子","土","F","기타","19960819","K-idol"],
+  ["은하","GFRIEND","壬申","水","F","기타","19970530","K-idol"],
+  ["유주","GFRIEND","己卯","土","F","기타","19971004","K-idol"],
+  ["신비","GFRIEND","辛巳","金","F","기타","19980603","K-idol"],
+  ["엄지","GFRIEND","戊戌","土","F","기타","19980819","K-idol"],
+  ["청하","솔로","丙子","火","F","기타","19960209","K-idol"],
+  ["전소미","솔로","辛未","金","F","기타","20010309","K-idol"],
+  ["헤이즈","솔로","辛亥","金","F","기타","19910809","K-idol"],
+  ["이하이","솔로","癸亥","水","F","기타","19960923","K-idol"],
+  ["백예린","솔로","己亥","土","F","기타","19970626","K-idol"],
+  ["안지영","솔로","戊申","土","F","기타","19950914","K-idol"],
+  ["베이비소울","Lovelyz","癸未","水","F","기타","19920706","K-idol"],
+  ["지애","Lovelyz","壬寅","水","F","기타","19930521","K-idol"],
+  ["지수","Lovelyz","戊辰","土","F","기타","19940211","K-idol"],
+  ["미주","Lovelyz","壬子","水","F","기타","19940923","K-idol"],
+  ["케이","Lovelyz","庚戌","金","F","기타","19950320","K-idol"],
+  ["진","Lovelyz","庚辰","金","F","기타","19960612","K-idol"],
+  ["수정","Lovelyz","乙丑","木","F","기타","19971119","K-idol"],
+  ["예인","Lovelyz","壬午","水","F","기타","19980604","K-idol"],
+  ["솔지","EXID","庚午","金","F","기타","19890110","K-idol"],
+  ["엘이","EXID","甲寅","木","F","기타","19911210","K-idol"],
+  ["하니","EXID","丁丑","火","F","기타","19920501","K-idol"],
+  ["혜린","EXID","丙子","火","F","기타","19930823","K-idol"],
+  ["정화","EXID","己亥","土","F","기타","19950508","K-idol"],
+  ["희진","LOONA","庚戌","金","F","기타","20001019","K-idol"],
+  ["현진","LOONA","丁丑","火","F","기타","20001115","K-idol"],
+  ["하슬","LOONA","壬辰","水","F","기타","19970818","K-idol"],
+  ["여진","LOONA","癸未","水","F","기타","20021111","K-idol"],
+  ["비비","LOONA","庚辰","金","F","기타","19961209","K-idol"],
+  ["김립","LOONA","癸巳","水","F","기타","19990210","K-idol"],
+  ["진솔","LOONA","丙戌","火","F","기타","19970613","K-idol"],
+  ["최리","LOONA","戊戌","土","F","기타","20010604","K-idol"],
+  ["이브","LOONA","丙寅","火","F","기타","19970524","K-idol"],
+  ["츄","LOONA","乙巳","木","F","기타","19991020","K-idol"],
+  ["고원","LOONA","辛巳","金","F","기타","20001119","K-idol"],
+  ["올리비아혜","LOONA","庚辰","金","F","기타","20011113","K-idol"],
+  ["주리","Rocket Punch","戊寅","土","F","기타","19971003","K-idol"],
+  ["연희","Rocket Punch","戊戌","土","F","기타","20001206","K-idol"],
+  ["수윤","Rocket Punch","己卯","土","F","기타","20010317","K-idol"],
+  ["윤경","Rocket Punch","戊辰","土","F","기타","20011101","K-idol"],
+  ["소희","Rocket Punch","己未","土","F","기타","20030814","K-idol"],
+  ["다현","Rocket Punch","癸未","水","F","기타","20050429","K-idol"],
+  ["동헌","VERIVERY","丁卯","火","M","기타","19950804","K-idol"],
+  ["호영","VERIVERY","己丑","土","M","기타","19980810","K-idol"],
+  ["민찬","VERIVERY","丙寅","火","M","기타","19980916","K-idol"],
+  ["계현","VERIVERY","丙寅","火","M","기타","19990514","K-idol"],
+  ["연호","VERIVERY","己丑","土","M","기타","20000531","K-idol"],
+  ["용승","VERIVERY","丙午","火","M","기타","20000617","K-idol"],
+  ["강민","VERIVERY","戊戌","土","M","기타","20030125","K-idol"],
+  ["효진","ONF","戊寅","土","M","기타","19940422","K-idol"],
+  ["이션","ONF","甲申","木","M","기타","19941224","K-idol"],
+  ["제이어스","ONF","甲辰","木","M","기타","19950113","K-idol"],
+  ["와이엇","ONF","甲寅","木","M","기타","19950123","K-idol"],
+  ["엠케이","ONF","辛亥","金","M","기타","19951116","K-idol"],
+  ["유","ONF","丁卯","火","M","기타","19990316","K-idol"],
+  ["한빈","TEMPEST","丙寅","火","M","기타","19980119","K-idol"],
+  ["형섭","TEMPEST","癸巳","水","M","기타","19990809","K-idol"],
+  ["혁","TEMPEST","乙巳","木","M","기타","20000417","K-idol"],
+  ["은찬","TEMPEST","辛酉","金","M","기타","20010227","K-idol"],
+  ["르우","TEMPEST","戊戌","土","M","기타","20010405","K-idol"],
+  ["태래","TEMPEST","丁丑","火","M","기타","20020509","K-idol"],
+  ["세현","DKZ","甲寅","木","M","기타","20000625","K-idol"],
+  ["민규","DKZ","壬申","水","M","기타","20010109","K-idol"],
+  ["재찬","DKZ","癸卯","水","M","기타","20011206","K-idol"],
+  ["주원","DKZ","辛亥","金","M","기타","20020413","K-idol"],
+  ["기석","DKZ","甲戌","木","M","기타","20040624","K-idol"],
+  ["윤지성","워너원","丁丑","火","M","기타","19910308","K-idol"],
+  ["하성운","워너원","丁未","火","M","기타","19940322","K-idol"],
+  ["황민현","워너원","壬申","水","M","기타","19950809","K-idol"],
+  ["옹성우","워너원","戊子","土","M","기타","19950825","K-idol"],
+  ["김재환","워너원","甲子","木","M","기타","19960527","K-idol"],
+  ["강다니엘","워너원","辛巳","金","M","기타","19961210","K-idol"],
+  ["박지훈","워너원","辛巳","金","M","기타","19990529","K-idol"],
+  ["박우진","워너원","戊午","土","M","기타","19991102","K-idol"],
+  ["배진영","워너원","戊辰","土","M","기타","20000510","K-idol"],
+  ["이대휘","워너원","壬辰","水","M","기타","20010129","K-idol"],
+  ["라이관린","워너원","己丑","土","M","기타","20010923","K-idol"],
+  ["건일","Xdinary Heroes","壬申","水","M","JYP","19980724","K-idol"],
+  ["정수","Xdinary Heroes","庚申","金","M","JYP","20010626","K-idol"],
+  ["가온","Xdinary Heroes","壬午","水","M","JYP","20020114","K-idol"],
+  ["오드","Xdinary Heroes","庚戌","金","M","JYP","20020611","K-idol"],
+  ["주연","Xdinary Heroes","癸未","水","M","JYP","20020912","K-idol"],
+  ["준한","Xdinary Heroes","戊午","土","M","JYP","20020818","K-idol"],
+  ["태연","SNSD","戊辰","土","F","SM","19890309","K-idol"],
+  ["써니","SNSD","乙亥","木","F","SM","19890515","K-idol"],
+  ["티파니","SNSD","癸巳","水","F","SM","19890801","K-idol"],
+  ["효연","SNSD","乙酉","木","F","SM","19890922","K-idol"],
+  ["유리","SNSD","己亥","土","F","SM","19891205","K-idol"],
+  ["수영","SNSD","丙午","火","F","SM","19900210","K-idol"],
+  ["윤아","SNSD","乙未","木","F","SM","19900530","K-idol"],
+  ["서현","SNSD","己巳","土","F","SM","19910628","K-idol"],
+  ["시우민","EXO","庚寅","金","M","SM","19900326","K-idol"],
+  ["수호","EXO","壬辰","水","M","SM","19910522","K-idol"],
+  ["레이","EXO","庚戌","金","M","SM","19911007","K-idol"],
+  ["백현","EXO","壬午","水","M","SM","19920506","K-idol"],
+  ["첸","EXO","庚子","金","M","SM","19920921","K-idol"],
+  ["찬열","EXO","丁未","火","M","SM","19921127","K-idol"],
+  ["도경수","EXO","癸巳","水","M","SM","19930112","K-idol"],
+  ["카이","EXO","庚子","金","M","SM","19940114","K-idol"],
+  ["세훈","EXO","戊辰","土","M","SM","19940412","K-idol"],
+  ["유노윤호","TVXQ","辛巳","金","M","SM","19860206","K-idol"],
+  ["최강창민","TVXQ","癸卯","水","M","SM","19880218","K-idol"],
+  ["이특","Super Junior","庚寅","金","M","SM","19830701","K-idol"],
+  ["희철","Super Junior","己亥","土","M","SM","19830710","K-idol"],
+  ["예성","Super Junior","庚寅","金","M","SM","19840824","K-idol"],
+  ["신동","Super Junior","庚午","金","M","SM","19850928","K-idol"],
+  ["은혁","Super Junior","戊寅","土","M","SM","19860404","K-idol"],
+  ["시원","Super Junior","辛巳","金","M","SM","19860407","K-idol"],
+  ["동해","Super Junior","壬辰","水","M","SM","19861015","K-idol"],
+  ["려욱","Super Junior","辛丑","金","M","SM","19870621","K-idol"],
+  ["규현","Super Junior","戊子","土","M","SM","19880203","K-idol"],
+  ["자니","NCT","辛未","金","M","SM","19950209","K-idol"],
+  ["태용","NCT","癸巳","水","M","SM","19950701","K-idol"],
+  ["유타","NCT","庚寅","金","M","SM","19951026","K-idol"],
+  ["쿤","NCT","丁酉","火","M","SM","19960101","K-idol"],
+  ["텐","NCT","甲午","木","M","SM","19960227","K-idol"],
+  ["도영","NCT","戊辰","土","M","SM","19960201","K-idol"],
+  ["재현","NCT","丁亥","火","M","SM","19970214","K-idol"],
+  ["윈윈","NCT","癸卯","水","M","SM","19971028","K-idol"],
+  ["정우","NCT","丁酉","火","M","SM","19980219","K-idol"],
+  ["샤오쥔","NCT","壬辰","水","M","SM","19990808","K-idol"],
+  ["헨드리","NCT","癸未","水","M","SM","19990928","K-idol"],
+  ["마크","NCT","丙戌","火","M","SM","19990802","K-idol"],
+  ["런쥔","NCT","庚辰","金","M","SM","20000323","K-idol"],
+  ["제노","NCT","辛亥","金","M","SM","20000423","K-idol"],
+  ["해찬","NCT","乙未","木","M","SM","20000606","K-idol"],
+  ["재민","NCT","癸卯","水","M","SM","20000813","K-idol"],
+  ["양양","NCT","辛丑","金","M","SM","20001010","K-idol"],
+  ["천러","NCT","己丑","土","M","SM","20011122","K-idol"],
+  ["지성","NCT","甲辰","木","M","SM","20020205","K-idol"],
+  ["쇼타로","RIIZE","丁亥","火","M","SM","20001125","K-idol"],
+  ["은석","RIIZE","辛巳","金","M","SM","20010319","K-idol"],
+  ["성찬","RIIZE","己卯","土","M","SM","20010913","K-idol"],
+  ["원빈","RIIZE","己巳","土","M","SM","20020302","K-idol"],
+  ["소희","RIIZE","戊戌","土","M","SM","20031121","K-idol"],
+  ["앤톤","RIIZE","己亥","土","M","SM","20040321","K-idol"],
+  ["루카","BABYMONSTER","丁亥","火","F","YG","20020320","K-idol"],
+  ["파리타","BABYMONSTER","壬午","水","F","YG","20050826","K-idol"],
+  ["아사","BABYMONSTER","丙子","火","F","YG","20060417","K-idol"],
+  ["아현","BABYMONSTER","乙亥","木","F","YG","20070411","K-idol"],
+  ["라미","BABYMONSTER","甲申","木","F","YG","20071017","K-idol"],
+  ["로라","BABYMONSTER","丙戌","火","F","YG","20080814","K-idol"],
+  ["치키타","BABYMONSTER","癸巳","水","F","YG","20090217","K-idol"],
+  ["씨엘","2NE1","丁卯","火","F","YG","19910226","K-idol"],
+  ["산다라박","2NE1","庚戌","金","F","YG","19841112","K-idol"],
+  ["박봄","2NE1","丁巳","火","F","YG","19840324","K-idol"],
+  ["공민지","2NE1","甲辰","木","F","YG","19940118","K-idol"],
+  ["이찬혁","AKMU","壬子","水","M","YG","19960912","K-idol"],
+  ["이수현","AKMU","丙辰","火","F","YG","19990504","K-idol"],
+  ["톰 홀랜드","톰 홀랜드","己巳","土","M","미국 배우","19960601","US-actor"],
+  ["젠데이아","젠데이아","辛丑","金","F","미국 배우","19960901","US-actor"],
+  ["티모시 샬라메","티모시 샬라메","壬辰","水","M","미국 배우","19951227","US-actor"],
+  ["스칼릿 조핸슨","스칼릿 조핸슨","庚申","金","F","미국 배우","19841122","US-actor"],
+  ["딜라바","딜라바","庚戌","金","F","중국 배우","19920603","C-actor"],
+  ["샤오잔","샤오잔","戊申","土","M","중국 배우","19911005","C-actor"],
+  ["양양","양양","壬午","水","M","중국 배우","19910909","C-actor"],
+  ["니시노 나나세","노기자카46","辛亥","金","F","노기자카46","19940525","J-idol"],
+  ["시라이시 마이","노기자카46","戊辰","土","F","노기자카46","19920820","J-idol"]
+];
+
+function jdn(y,m,d){
+  const a = Math.floor((14-m)/12);
+  const y2 = y+4800-a;
+  const m2 = m+12*a-3;
+  return d + Math.floor((153*m2+2)/5) + 365*y2 + Math.floor(y2/4) - Math.floor(y2/100) + Math.floor(y2/400) - 32045;
+}
+function mod(n,m){ return ((n%m)+m)%m; }
+
+function dayPillar(y,m,d){
+  const j = jdn(y,m,d);
+  return { stemIdx: mod(j+9,10), branchIdx: mod(j+1,12) };
+}
+function hourPillar(dayStemIdx, hour){
+  const branchIdx = Math.floor(mod(hour+1,24)/2);
+  const stemIdx = mod(dayStemIdx*2 + branchIdx, 10);
+  return { stemIdx, branchIdx };
+}
+
+function generates(a,b){ const i=GEN_ORDER.indexOf(a); return GEN_ORDER[(i+1)%5]===b; }
+function controls(a,b){ const i=CTRL_ORDER.indexOf(a); return CTRL_ORDER[(i+1)%5]===b; }
+
+function relation(userElem, targetElem){
+  if(targetElem===userElem) return {tier:2, label:"비겁(比劫)"};
+  if(generates(userElem,targetElem)) return {tier:3, label:"식상(食傷)"};
+  if(generates(targetElem,userElem)) return {tier:1, label:"인성(印星)"};
+  if(controls(userElem,targetElem)) return {tier:4, label:"재성(財星)"};
+  if(controls(targetElem,userElem)) return {tier:5, label:"관성(官星)"};
+}
+
+const TIER_DESC = {
+  1:"나를 생조·보호하는 오행 — 이론상 가장 편안하고 안정적인 조합",
+  2:"동질감을 주는 같은 오행 — 동료·우군 같은 조합",
+  3:"내가 정성과 애정을 쏟는 오행 — '덕질'의 정서에 가까운 조합",
+  4:"내가 관리·통제하려는 오행 — 목표지향적이나 다소 소모적일 수 있음",
+  5:"나를 자극·압박하는 오행 — 긴장감은 있으나 부담이 클 수 있음"
+};
+
+function runCalc(){
+  const raw = document.getElementById('bdate').value.replace(/\D/g,'');
+  if(raw.length !== 8){ alert('생년월일을 8자리 숫자로 입력해 주세요. 예: 19950719'); return; }
+  const y = +raw.slice(0,4), m = +raw.slice(4,6), d = +raw.slice(6,8);
+  if(y<1920 || y>2026 || m<1 || m>12 || d<1 || d>31){ alert('올바른 날짜가 아닙니다. 8자리 숫자로 입력해 주세요. 예: 19950719'); return; }
+
+  const dp = dayPillar(y,m,d);
+  const userStemElem = ELEM_NAMES[STEM_ELEM_IDX[dp.stemIdx]];
+  const dayHanja = STEMS[dp.stemIdx] + BRANCHES[dp.branchIdx];
+
+  let hourInfo = "";
+  let userHourBranch = null;
+  const hourVal = document.getElementById('bhour').value;
+  if(hourVal !== ""){
+    const hh = Number(hourVal);
+    const hp = hourPillar(dp.stemIdx, hh);
+    userHourBranch = hp.branchIdx;
+    hourInfo = " · 시주 " + STEMS[hp.stemIdx] + BRANCHES[hp.branchIdx];
+  }
+
+  // 사용자 년주·월주(생년월일 기반) + 신강/신약(身強身弱) 판정
+  const uSI = dp.stemIdx;
+  const yp = yearPillar(y,m,d), mp = monthPillar(y,m,d, yp.stemIdx);
+  const yHanja = STEMS[yp.stemIdx]+BRANCHES[yp.branchIdx];
+  const mHanja = STEMS[mp.stemIdx]+BRANCHES[mp.branchIdx];
+  const userPillars = [
+    {stem:yp.stemIdx, branch:yp.branchIdx, weight:1},
+    {stem:mp.stemIdx, branch:mp.branchIdx, weight:2}, // 월령 가중
+    {stem:dp.stemIdx, branch:dp.branchIdx, weight:1, isDay:true} // 일간 자신은 세력 제외
+  ];
+  if(userHourBranch !== null){ const hp2=hourPillar(dp.stemIdx, Number(hourVal)); userPillars.push({stem:hp2.stemIdx, branch:hp2.branchIdx, weight:1}); }
+  const need = bodyStrength(userPillars, userStemElem);
+  const bodyLabel = need > 0.06 ? "신약(身弱)" : (need < -0.06 ? "신강(身強)" : "중화(中和)");
+
+  document.getElementById('dmBadge').textContent = STEMS[dp.stemIdx];
+  document.getElementById('dmBadge').style.background = ELEM_COLOR[userStemElem];
+  document.getElementById('dmBadge').style.boxShadow = "0 0 26px -2px " + ELEM_HEX[userStemElem] + "aa";
+  document.getElementById('dmTitle').textContent =
+    `일간: ${STEMS[dp.stemIdx]}(${STEMS_KR[dp.stemIdx]}) · ${ELEM_KR[STEM_ELEM_IDX[dp.stemIdx]]}(${userStemElem}) · ${bodyLabel}`;
+  document.getElementById('dmDesc').textContent = `일주 ${dayHanja} · 월주 ${mHanja} · 년주 ${yHanja}${hourInfo}`;
+
+  const bar = document.getElementById('elembar');
+  bar.innerHTML = "";
+  ELEM_NAMES.forEach(e=>{
+    const seg = document.createElement('div');
+    seg.className = 'seg';
+    seg.style.background = ELEM_COLOR[e];
+    seg.style.opacity = (e===userStemElem) ? '1' : '0.25';
+    bar.appendChild(seg);
+  });
+
+  // D-1: 신청자 성별 → 명리 '이성 인연' 십신 (남=재성, 여=관성) 소폭 반영. 미선택이면 중립.
+  const userSex = document.getElementById('bsex').value;      // "", "F", "M"
+  const iseongFam = userSex==='M' ? '재성' : (userSex==='F' ? '관성' : null);
+
+  // ---- 사주 다층 점수화 (10신 + 천간합 + 지장간 + 일/년/월지 + 신강신약 개인화) ----
+  const scored = IDOLS.map(([name,group,pillar,elem,gender,agency,dob,cat])=>{
+    const tSI = STEMS.indexOf(pillar[0]);
+    const tBI = BRANCHES.indexOf(pillar[1]);
+    const g   = tenGod(uSI, tSI);
+    const hap = ganHap(uSI, tSI);
+    // ③ 신강/신약 개인화: 도움(인성·비겁)/설기(식상·재성·관성) 계열 가감
+    const adjW = g.w + (FAM_DIR[g.fam]||0) * need * 10;
+    const br  = branchRel(dp.branchIdx, tBI);            // 일지 관계
+    let raw = adjW + (hap ? 6 : 0) + br.score;
+
+    // 성별 기반 '이성 인연' 가점(+8, 신강신약 가중보다 작게) + 해당 관계 라벨/이유 리프레이즈
+    let sexRole=null, sexReason=null;
+    if(iseongFam && g.fam===iseongFam){
+      raw += 8;
+      sexRole = "이성적 매력형";
+      if(iseongFam==='관성'){ sexReason = (g.name==='정관')
+        ? "나를 듬직하게 이끄는 관계라, 기대고 싶은 이성적 매력이 커요."
+        : "나를 강하게 리드하는 관계라, 카리스마에 이성적으로 끌려요."; }
+    }
+
+    // ① 지장간(支藏干): 상대 일지 정기의 십신 (중심 20 기준, 가중 0.15)
+    raw += (GODS[godName(uSI, JIJANG[tBI])].w - 20) * 0.15;
+
+    // ② 년지(띠)·월지 궁합 (아이돌 생년월일에서 년·월주 계산)
+    let yjNote = "";
+    if(dob && dob.length === 8){
+      const dy=+dob.slice(0,4), dm=+dob.slice(4,6), dd=+dob.slice(6,8);
+      const iyp=yearPillar(dy,dm,dd), imp=monthPillar(dy,dm,dd, iyp.stemIdx);
+      const yb=branchRel(yp.branchIdx, iyp.branchIdx); raw += yb.score * 0.4;
+      raw += branchRel(mp.branchIdx, imp.branchIdx).score * 0.3;
+      if(yb.score >= 11) yjNote = " · 띠 " + yb.tag.replace("일지 ","");
+    }
+
+    let reason = sexReason || g.reason;
+    if(hap) reason += " 게다가 일간끼리 천간합(天干合)을 이루는 특별한 인연이에요.";
+    if(br.reason) reason += " " + br.reason;
+
+    // 시각 입력 시 시지(時支) 관계 (가중 0.6)
+    let hourNote = "";
+    if(userHourBranch !== null){
+      const br2 = branchRel(userHourBranch, tBI);
+      raw += br2.score * 0.6;
+      if(br2.score !== 0){ const t=br2.tag.replace("일지 ",""); hourNote=" · 시지 "+t; reason+=` 태어난 시각의 지지와도 ${t} 관계예요.`; }
+    }
+
+    const relLabel = `${g.name}(${g.h})` + (hap ? " · 천간합" : "");
+    return {name, group, pillar, elem, gender, agency, cat:cat||"K-idol",
+            relLabel, role: sexRole || g.role, branchTag:br.tag+yjNote, hourNote, raw, reason};
+  });
+
+  // 전체 풀(546명) 기준 최소~최대로 정규화 → 0~100(%), 소수 둘째 자리 (필터와 무관하게 고정)
+  let lo=Infinity, hi=-Infinity;
+  scored.forEach(s=>{ if(s.raw<lo)lo=s.raw; if(s.raw>hi)hi=s.raw; });
+  const span = (hi-lo) || 1;
+  scored.forEach(s=>{ s.score=s.raw; s.pct = Math.round((s.raw-lo)/span*10000)/100; });
+
+  // 이번 매칭의 전체 1위(내 최애 후보)를 주간 리포트용으로 적립
+  try{ const top = scored.reduce((a,b)=> b.score>a.score?b:a); logFav(top); }catch(e){}
+
+  const prevGender = (window._saju && window._saju.activeGender) || "F";
+  const prevScope  = (window._saju && window._saju.scope) || "";
+  const prevAgency = (window._saju && window._saju.activeAgency) || "";
+  const prevCat    = (window._saju && window._saju.activeCat) || "K-idol";
+  window._saju = {
+    stem: STEMS[dp.stemIdx], stemKr: STEMS_KR[dp.stemIdx],
+    elemKr: ELEM_KR[STEM_ELEM_IDX[dp.stemIdx]], elem: userStemElem,
+    dayHanja, scored, activeGender: prevGender, scope: prevScope, activeAgency: prevAgency, activeCat: prevCat
+  };
+  applyScopeUI();
+  renderRanks();
+
+  document.getElementById('shareBtn').disabled = false;
+  document.getElementById('shareHint').textContent = "";
+
+  document.getElementById('result').classList.remove('hidden');
+  document.getElementById('result').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+const TOP_N = 8;
+
+// scope: "" = 전체 / "ag:소속사" = 소속사 전체 / "gr:그룹" = 특정 그룹
+// 카테고리(한국 아이돌 / 일본 아이돌 / 중국 배우 / 미국 배우 …)
+const CAT_NAMES = {
+  "K-idol":{ko:"한국 아이돌",en:"K-pop"}, "J-idol":{ko:"일본 아이돌",en:"J-pop"},
+  "C-actor":{ko:"중국 배우",en:"C-actor"}, "US-actor":{ko:"미국 배우",en:"US actor"},
+  "Etc":{ko:"기타",en:"Etc"}
+};
+const catLabel = c => (CAT_NAMES[c] ? CAT_NAMES[c].ko : c);
+const CAT_MIN = 30; // 카테고리는 데이터가 이 개수 이상 쌓여야 노출
+function scopeMatch(x){
+  const s = window._saju;
+  if(x.cat !== (s.activeCat || "K-idol")) return false; // 카테고리 우선 필터
+  const v = s.scope || "";
+  if(v.startsWith("ag:")) return x.agency === v.slice(3);
+  if(v.startsWith("gr:")) return x.group === v.slice(3);
+  return true;
+}
+function isGroupScope(){ return (window._saju.scope||"").startsWith("gr:"); }
+// 성별 탭이 필요한가? (그룹 지정이면 불필요, 소속사/전체에 두 성별이 다 있으면 필요)
+function genderTabsNeeded(){
+  if(isGroupScope()) return false;
+  const base = window._saju.scored.filter(scopeMatch);
+  return base.some(x=>x.gender==="F") && base.some(x=>x.gender==="M");
+}
+// 현재 필터 기준 목록 (점수 내림차순)
+function currentList(){
+  const s = window._saju;
+  let base = s.scored.filter(scopeMatch);
+  if(genderTabsNeeded()) base = base.filter(x=>x.gender===s.activeGender);
+  return base.slice().sort((a,b)=> b.score-a.score);
+}
+function currentLabel(){
+  const s = window._saju, v = s.scope || "";
+  const catPre = (s.activeCat && s.activeCat!=="K-idol") ? catLabel(s.activeCat)+" · " : "";
+  if(v.startsWith("ag:")){
+    const ag = v.slice(3);
+    return catPre + (genderTabsNeeded() ? `${ag} · ${s.activeGender==="M"?"남자":"여자"}` : ag);
+  }
+  if(v.startsWith("gr:")) return catPre + groupLabel(v.slice(3));
+  return catPre + (s.activeGender==="M" ? "남자" : "여자") + (s.activeCat==="K-idol"?" 아이돌":"");
+}
+// 성별 탭 노출/활성 상태 동기화
+function syncControls(){
+  const need = genderTabsNeeded();
+  document.getElementById('genderTabs').style.display = need ? "flex" : "none";
+  document.querySelectorAll('.gtab').forEach(t=>t.classList.toggle('active', t.dataset.g===window._saju.activeGender));
+}
+
+function cardHTML(r,i){
+  return `
+    <div class="rank-card${i<3?' rank-top':''}" style="animation-delay:${i*70}ms">
+      <div class="rank-num">${i+1}</div>
+      <div class="rank-body">
+        <div class="rank-name">${r.name}<span class="grp">${r.group}</span>
+          <span class="pill"><span class="dot" style="background:${ELEM_COLOR[r.elem]}"></span>${r.pillar} · ${r.elem}</span></div>
+        <div class="rank-meta">${r.relLabel} · ${r.role} · ${r.branchTag}${r.hourNote}</div>
+        <div class="rank-reason">${r.reason}</div>
+        <div class="rank-report"><button type="button" class="rep-link" onclick="openError('${encodeURIComponent(r.name)}','${encodeURIComponent(r.group)}')">ⓘ 정보 오류 신고</button></div>
+      </div>
+      <div class="rank-score"><div class="pct">${r.pct.toFixed(2)}<span style="font-size:13px">%</span></div><div class="pct-label">궁합</div></div>
+    </div>`;
+}
+
+function moreLabel(){
+  const n = currentList().length;
+  return `전체 순위 펼쳐보기 (9~${n}위)`;
+}
+
+function renderRanks(){
+  const list = currentList();
+  document.getElementById('ranklist').innerHTML = list.slice(0,TOP_N).map((r,i)=>cardHTML(r,i)).join("");
+  const restEl = document.getElementById('rankRest');
+  restEl.classList.add('hidden'); restEl.dataset.built = ""; restEl.innerHTML = "";
+  const btn = document.getElementById('moreBtn');
+  btn.textContent = moreLabel();
+  btn.style.display = list.length > TOP_N ? "" : "none";
+}
+
+function switchGender(g){
+  if(!window._saju) return;
+  window._saju.activeGender = g;
+  syncControls();
+  renderRanks();
+}
+
+// 하위 그룹 드롭다운 변경: "" = 소속사 전체 / "gr:그룹" = 특정 그룹
+function onGroupChange(sel){
+  if(!window._saju) return;
+  const v = sel.value;
+  window._saju.scope = v ? v : ("ag:" + window._saju.activeAgency);
+  syncControls();
+  renderRanks();
+}
+
+// 성별 선택 버튼: 숨은 #bsex 값 갱신 + 활성 표시
+function selectSex(btn){
+  document.getElementById('bsex').value = btn.dataset.s;
+  document.querySelectorAll('#sexTabs .sexbtn').forEach(b=>b.classList.toggle('active', b===btn));
+}
+
+// 전체 순위(9위~) 펼치기/접기 — 현재 필터 기준
+function toggleRest(){
+  const el = document.getElementById('rankRest');
+  const btn = document.getElementById('moreBtn');
+  if(el.classList.contains('hidden')){
+    if(!el.dataset.built){
+      const list = currentList();
+      el.innerHTML = list.slice(TOP_N).map((x,i)=>`
+        <div class="rest-row">
+          <span class="r-n">${i+1+TOP_N}</span>
+          <span class="dot" style="background:${ELEM_COLOR[x.elem]}"></span>
+          <span class="r-name">${x.name} <span class="r-grp">${x.group}</span></span>
+          <span class="r-rel">${x.relLabel.replace(/\(.*\)/,'')}</span>
+          <span class="r-pct">${x.pct.toFixed(2)}%</span>
+        </div>`).join("");
+      el.dataset.built = "1";
+    }
+    el.classList.remove('hidden');
+    btn.textContent = "접기";
+  }else{
+    el.classList.add('hidden');
+    btn.textContent = moreLabel();
+  }
+}
+
+// 시각 드롭다운(24시간) 채우기
+(function(){
+  const sel = document.getElementById('bhour');
+  if(!sel) return;
+  const opt0 = document.createElement('option');
+  opt0.value = ""; opt0.textContent = "모름 / 미상";
+  sel.appendChild(opt0);
+  for(let h=0; h<24; h++){
+    const o = document.createElement('option');
+    o.value = String(h);
+    const hh = String(h).padStart(2,'0');
+    o.textContent = `${h}시 (${hh}:00~${hh}:59)`;
+    sel.appendChild(o);
+  }
+})();
+
+// 아이돌 총원·그룹 수 표시 (매일 데이터가 늘어남)
+(function(){
+  const ic=document.getElementById('idolCount'); if(ic) ic.textContent=IDOLS.length;
+  const gc=document.getElementById('groupCount');
+  if(gc) gc.textContent=new Set(IDOLS.map(r=>r[1])).size;
+})();
+
+// 생년월일 입력: 숫자만 허용·8자리 제한, Enter로 계산
+// 모바일 한글 IME 조합 중에는 값을 건드리지 않아야 입력이 씹히지 않는다.
+(function(){
+  const el = document.getElementById('bdate');
+  if(!el) return;
+  const sanitize = ()=>{
+    const cleaned = el.value.replace(/\D/g,'').slice(0,8);
+    if(cleaned !== el.value) el.value = cleaned; // 변경될 때만 재할당(커서 튐 방지)
+  };
+  el.addEventListener('input', e=>{ if(e.isComposing) return; sanitize(); });
+  el.addEventListener('compositionend', sanitize); // IME 조합 완료 후 정제
+  el.addEventListener('blur', sanitize);
+  el.addEventListener('keydown', e=>{ if(e.key === 'Enter'){ e.preventDefault(); runCalc(); } });
+})();
+
+// 카테고리 목록 (데이터에 존재하는 것만, K-idol 우선)
+const CAT_ORDER = ["K-idol","J-idol","C-actor","US-actor","Etc"];
+function catsPresent(){
+  const set={}; IDOLS.forEach(r=>{ set[r[7]||"K-idol"]=(set[r[7]||"K-idol"]||0)+1; });
+  const order = CAT_ORDER.filter(c=>set[c]).concat(Object.keys(set).filter(c=>!CAT_ORDER.includes(c)));
+  return {order, count:set};
+}
+// 노출 대상 카테고리: 데이터가 CAT_MIN(30) 이상 쌓인 것만
+function shownCats(){
+  const {order,count}=catsPresent();
+  return order.filter(c=>count[c]>=CAT_MIN);
+}
+// 카테고리 버튼 (노출 대상이 2개 이상일 때만 행 표시)
+function renderCategoryButtons(){
+  const {count}=catsPresent();
+  const shown=shownCats();
+  const row=document.getElementById('catRow'), wrap=document.getElementById('catBtns');
+  if(!wrap) return;
+  // 활성 카테고리가 노출 대상이 아니면 보정
+  if(!shown.includes(window._saju.activeCat)) window._saju.activeCat = shown[0] || "K-idol";
+  if(shown.length<=1){ row.style.display="none"; return; }
+  const cur=window._saju.activeCat;
+  wrap.innerHTML = shown.map(c=>`<button class="agbtn${c===cur?' active':''}" data-c="${c}" onclick="selectCategory('${c}')">${catLabel(c)}<span class="agn">${count[c]}</span></button>`).join("");
+  row.style.display="flex";
+}
+// 활성 카테고리 내에서 소속사 버튼 렌더
+function renderAgencyButtons(){
+  const wrap=document.getElementById('agencyBtns'); if(!wrap) return;
+  const cat=window._saju.activeCat||"K-idol";
+  const inCat=IDOLS.filter(r=>(r[7]||"K-idol")===cat);
+  const counts={}, order=[];
+  inCat.forEach(([n,g,p,e,ge,a])=>{ if(counts[a]===undefined){counts[a]=0; order.push(a);} counts[a]++; });
+  // K-idol은 5대 소속사 순서, 그 외 카테고리는 인원수 순
+  const agencies = (cat==="K-idol") ? AGENCY_ORDER.filter(a=>counts[a]) : order.sort((x,y)=>counts[y]-counts[x]);
+  const mk=(a,label,cnt)=>`<button class="agbtn${a===(window._saju.activeAgency||"")?' active':''}" data-a="${a}" onclick="selectAgency('${a.replace(/"/g,'&quot;')}')">${label}<span class="agn">${cnt}</span></button>`;
+  wrap.innerHTML = mk("","전체",inCat.length) + agencies.map(a=>mk(a,a,counts[a])).join("");
+}
+
+// 선택된 소속사의 하위 그룹 드롭다운 채우기 (활성 카테고리 내)
+function populateGroupDropdown(agency){
+  const sel = document.getElementById('groupFilter');
+  sel.innerHTML = "";
+  const cat=window._saju.activeCat||"K-idol";
+  const gcount = {}, order = [];
+  IDOLS.forEach(([n,g,p,e,ge,a,dob,c])=>{ if((c||"K-idol")===cat && a===agency){ if(gcount[g]===undefined){ gcount[g]=0; order.push(g); } gcount[g]++; } });
+  const agTotal = order.reduce((s,g)=>s+gcount[g],0);
+  const oAll = document.createElement('option');
+  oAll.value = ""; oAll.textContent = `${agency} 전체 (${agTotal}명)`;
+  sel.appendChild(oAll);
+  order.forEach(g=>{
+    const o = document.createElement('option');
+    o.value = `gr:${g}`; o.textContent = `${groupLabel(g)} (${gcount[g]}명)`;
+    sel.appendChild(o);
+  });
+}
+
+// 카테고리 전환
+function selectCategory(c){
+  if(!window._saju) return;
+  window._saju.activeCat = c;
+  window._saju.activeAgency = "";
+  window._saju.scope = "";
+  document.getElementById('subgroupRow').style.display = "none";
+  const gs=document.getElementById('groupSearch'); if(gs) gs.value="";
+  renderCategoryButtons();
+  renderAgencyButtons();
+  syncControls();
+  renderRanks();
+}
+
+// 소속사 버튼 선택 → 하위 그룹 드롭다운 노출/숨김
+function selectAgency(a){
+  if(!window._saju) return;
+  window._saju.activeAgency = a;
+  document.querySelectorAll('#agencyBtns .agbtn').forEach(b=>b.classList.toggle('active', b.dataset.a===a));
+  const row = document.getElementById('subgroupRow');
+  if(a === ""){
+    row.style.display = "none";
+    window._saju.scope = "";
+  }else{
+    populateGroupDropdown(a);
+    row.style.display = "flex";
+    window._saju.scope = "ag:" + a;
+  }
+  syncControls();
+  renderRanks();
+}
+
+// 현재 상태(카테고리/소속사/그룹)에 맞춰 버튼·드롭다운 UI 동기화
+function applyScopeUI(){
+  const s = window._saju, a = s.activeAgency || "";
+  renderCategoryButtons();
+  renderAgencyButtons();
+  document.querySelectorAll('#agencyBtns .agbtn').forEach(b=>b.classList.toggle('active', b.dataset.a===a));
+  const row = document.getElementById('subgroupRow');
+  if(a === ""){
+    row.style.display = "none";
+  }else{
+    populateGroupDropdown(a);
+    row.style.display = "flex";
+    document.getElementById('groupFilter').value = (s.scope||"").startsWith("gr:") ? s.scope : "";
+  }
+  syncControls();
+}
+
+// ---- 그룹 검색 (한글·영문 부분일치) ----
+const GROUP_INFO = (function(){
+  const info = {};
+  IDOLS.forEach(([n,g,p,e,ge,a,dob,c])=>{ if(!info[g]) info[g]={agency:a, cat:c||"K-idol", count:0}; info[g].count++; });
+  return info;
+})();
+function selectGroupDirect(g){
+  if(!window._saju) return;
+  const gi = GROUP_INFO[g] || {agency:"기타", cat:"K-idol"};
+  window._saju.activeCat = gi.cat;      // 그룹이 속한 카테고리로 전환
+  window._saju.activeAgency = gi.agency;
+  window._saju.scope = "gr:" + g;
+  applyScopeUI();
+  document.getElementById('groupFilter').value = "gr:" + g;
+  document.getElementById('searchResults').classList.add('hidden');
+  document.getElementById('groupSearch').value = groupLabel(g);
+  renderRanks();
+  document.getElementById('ranklist').scrollIntoView({behavior:'smooth', block:'start'});
+}
+function runGroupSearch(){
+  const q = document.getElementById('groupSearch').value.trim().toLowerCase();
+  const box = document.getElementById('searchResults');
+  if(!q){ box.classList.add('hidden'); box.innerHTML=""; return; }
+  const sc = new Set(shownCats()); // 노출 대상 카테고리의 그룹만 검색
+  const matches = Object.keys(GROUP_INFO).filter(g=>{
+    if(!sc.has(GROUP_INFO[g].cat)) return false;
+    const nm = GROUP_NAMES[g] || {ko:g,en:g};
+    return g.toLowerCase().includes(q) || nm.ko.toLowerCase().includes(q) || nm.en.toLowerCase().includes(q);
+  }).sort((x,y)=>GROUP_INFO[y].count-GROUP_INFO[x].count).slice(0,30);
+  if(matches.length===0){ box.innerHTML = `<div class="sr-empty">일치하는 그룹이 없어요</div>`; box.classList.remove('hidden'); return; }
+  box.innerHTML = matches.map(g=>{
+    const nm = GROUP_NAMES[g] || {ko:g,en:g};
+    const enPart = (nm.ko===nm.en) ? "" : `<span class="sr-en">${nm.en}</span>`;
+    return `<div class="sr-item" data-g="${g.replace(/"/g,'&quot;')}">${nm.ko} ${enPart}<span class="sr-meta">${GROUP_INFO[g].agency} · ${GROUP_INFO[g].count}명</span></div>`;
+  }).join("");
+  box.classList.remove('hidden');
+  box.querySelectorAll('.sr-item').forEach(el=>el.addEventListener('mousedown', e=>{ e.preventDefault(); selectGroupDirect(el.dataset.g); }));
+}
+(function(){
+  const inp = document.getElementById('groupSearch');
+  if(!inp) return;
+  inp.addEventListener('input', runGroupSearch);
+  inp.addEventListener('focus', runGroupSearch);
+  inp.addEventListener('blur', ()=>{ setTimeout(()=>document.getElementById('searchResults').classList.add('hidden'), 150); });
+})();
+
+// ---- 결과 카드 이미지 생성 (외부 라이브러리 없이 Canvas로 직접 렌더) ----
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
+
+function drawShareCard(){
+  const s = window._saju;
+  const W = 1080, H = 1350;
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  // 배경
+  const bg = ctx.createLinearGradient(0,0,W,H);
+  bg.addColorStop(0,"#1a1236");
+  bg.addColorStop(1,"#0e0a1f");
+  ctx.fillStyle = bg;
+  ctx.fillRect(0,0,W,H);
+  // 네온 광원 (핑크 + 퍼플)
+  const glowP = ctx.createRadialGradient(W*0.12,-60,0,W*0.12,-60,760);
+  glowP.addColorStop(0,"#ff3d9a55"); glowP.addColorStop(1,"transparent");
+  ctx.fillStyle = glowP; ctx.fillRect(0,0,W,H);
+  const glowV = ctx.createRadialGradient(W*1.02,40,0,W*1.02,40,720);
+  glowV.addColorStop(0,"#7b5cff4d"); glowV.addColorStop(1,"transparent");
+  ctx.fillStyle = glowV; ctx.fillRect(0,0,W,H);
+
+  const gold = "#ff4d97", ink = "#f3edff", dim = "#ab9fce";
+  const M = 90; // margin
+
+  // eyebrow
+  ctx.fillStyle = gold;
+  ctx.fillRect(M,110,44,3);
+  ctx.font = "500 26px 'Noto Sans KR', sans-serif";
+  ctx.textBaseline = "alphabetic";
+  ctx.fillText("오행 상생상극 · 궁합 매칭", M+62, 122);
+
+  // title (그라디언트)
+  const tg = ctx.createLinearGradient(M,0,M+660,0);
+  tg.addColorStop(0,"#ff5da2"); tg.addColorStop(0.5,"#c07bff"); tg.addColorStop(1,"#43e0f0");
+  ctx.fillStyle = tg;
+  ctx.font = "68px 'Jua', 'Noto Sans KR', sans-serif";
+  ctx.fillText("사주 궁합 아이돌 매칭", M, 210);
+
+  // day-master badge
+  const cx = M+70, cy = 350, rad = 70;
+  ctx.beginPath();
+  ctx.arc(cx,cy,rad,0,Math.PI*2);
+  ctx.fillStyle = ELEM_HEX[s.elem];
+  ctx.fill();
+  ctx.fillStyle = "#170e2e";
+  ctx.font = "800 62px 'Nanum Myeongjo', serif";
+  ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.fillText(s.stem, cx, cy+4);
+  ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
+
+  ctx.fillStyle = ink;
+  ctx.font = "700 42px 'Nanum Myeongjo', serif";
+  ctx.fillText(`일간: ${s.stem}(${s.stemKr}) · ${s.elemKr}(${s.elem})`, cx+rad+40, cy-8);
+  ctx.fillStyle = dim;
+  ctx.font = "400 30px 'Noto Sans KR', sans-serif";
+  ctx.fillText(`일주(日柱): ${s.dayHanja}`, cx+rad+40, cy+40);
+
+  // 오행 막대
+  const barY = 470, barW = (W-2*M-4*10)/5;
+  ELEM_NAMES.forEach((e,i)=>{
+    const x = M + i*(barW+10);
+    ctx.fillStyle = ELEM_HEX[e];
+    ctx.globalAlpha = (e===s.elem)?1:0.22;
+    roundRect(ctx,x,barY,barW,14,7); ctx.fill();
+    ctx.globalAlpha = 1;
+  });
+
+  // 추천 순위 섹션
+  ctx.fillStyle = ink;
+  ctx.font = "40px 'Jua', 'Noto Sans KR', sans-serif";
+  ctx.fillText("덕질 궁합 추천 순위", M, 540);
+  ctx.fillStyle = dim;
+  ctx.font = "400 24px 'Noto Sans KR', sans-serif";
+  ctx.fillText(`${currentLabel()} · 오로지 사주 특성으로 선정`, M, 574);
+
+  const top = currentList().slice(0,6);
+  const yStart = 606, rowH = 112, cardH = 96;
+  top.forEach((r,i)=>{
+    const top0 = yStart + i*rowH;
+    // 카드 배경
+    ctx.fillStyle = (i<3) ? "#241247" : "#1c1338";
+    roundRect(ctx, M, top0, W-2*M, cardH, 16); ctx.fill();
+    const midY = top0 + cardH/2;
+    // 랭크 원
+    const rnx = M+48;
+    ctx.beginPath(); ctx.arc(rnx, midY, 29, 0, Math.PI*2);
+    if(i<3){ const cg = ctx.createLinearGradient(rnx-29,midY-29,rnx+29,midY+29); cg.addColorStop(0,"#ff4d97"); cg.addColorStop(1,"#8b5cf6"); ctx.fillStyle = cg; }
+    else { ctx.fillStyle = "#2a1f4d"; }
+    ctx.fill();
+    ctx.fillStyle = (i<3) ? "#ffffff" : gold;
+    ctx.font = "30px 'Jua', 'Noto Sans KR', sans-serif";
+    ctx.textAlign="center"; ctx.textBaseline="middle";
+    ctx.fillText(String(i+1), rnx, midY+2);
+    ctx.textAlign="left"; ctx.textBaseline="alphabetic";
+    // 이름 + 그룹
+    const tx = M+100;
+    ctx.fillStyle = ink;
+    ctx.font = "700 34px 'Noto Sans KR', sans-serif";
+    ctx.fillText(r.name, tx, top0+42);
+    const nameW = ctx.measureText(r.name).width;
+    ctx.fillStyle = dim;
+    ctx.font = "400 23px 'Noto Sans KR', sans-serif";
+    ctx.fillText(r.group, tx+nameW+14, top0+42);
+    // 관계 메타 (오행 점 + 일주 + 십신 + 지지)
+    ctx.beginPath(); ctx.arc(tx+7, top0+72, 7, 0, Math.PI*2);
+    ctx.fillStyle = ELEM_HEX[r.elem]; ctx.fill();
+    ctx.fillStyle = gold;
+    ctx.font = "500 23px 'Noto Sans KR', sans-serif";
+    ctx.fillText(`${r.pillar} · ${r.relLabel} · ${r.branchTag}`, tx+22, top0+79);
+    // 궁합 %
+    ctx.fillStyle = ink;
+    ctx.font = "33px 'Jua', 'Noto Sans KR', sans-serif";
+    ctx.textAlign="right";
+    ctx.fillText(`${r.pct.toFixed(2)}%`, W-M-26, midY+11);
+    ctx.textAlign="left";
+  });
+
+  // footer
+  ctx.fillStyle = "#6b5f96";
+  ctx.font = "400 24px 'Noto Sans KR', sans-serif";
+  ctx.fillText("사주 궁합 아이돌 매칭 · 오락용 해석", M, H-60);
+
+  return canvas;
+}
+
+async function shareResult(){
+  if(!window._saju){ return; }
+  const hint = document.getElementById('shareHint');
+  hint.textContent = "이미지 생성 중…";
+  try{
+    if(document.fonts && document.fonts.ready){ await document.fonts.ready; }
+  }catch(e){}
+
+  const canvas = drawShareCard();
+  const fileName = `사주궁합_${window._saju.stem}${window._saju.stemKr}.png`;
+
+  canvas.toBlob(async (blob)=>{
+    if(!blob){ hint.textContent = "이미지 생성 실패"; return; }
+    const file = new File([blob], fileName, {type:"image/png"});
+
+    // Web Share API (파일 공유 지원 시 — 주로 모바일)
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      try{
+        await navigator.share({files:[file], title:"사주 궁합 아이돌 매칭",
+          text:"내 일간으로 본 아이돌 궁합 결과"});
+        hint.textContent = "공유 완료";
+        return;
+      }catch(e){
+        if(e && e.name === "AbortError"){ hint.textContent = ""; return; }
+        // 공유 실패 시 다운로드로 폴백
+      }
+    }
+    // 다운로드 폴백 (데스크톱 등)
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = fileName;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 1000);
+    hint.textContent = "이미지를 저장했습니다";
+  }, "image/png");
+}
+
+// ================= 제보 & 업데이트 공지 =================
+// 서버리스(Cloudflare Worker) 제보 엔드포인트. 배포 후 URL을 여기에 넣으면 활성화됩니다.
+const SUGGEST_ENDPOINT = "https://saju-suggest.thsjsl1234.workers.dev/submit";
+const SUGGEST_COOLDOWN_MS = 60*60*1000; // 소프트 제한: 1시간
+
+function openSuggest(){
+  document.getElementById('suggestForm').classList.remove('hidden');
+  document.getElementById('suggestDone').classList.add('hidden');
+  const e=document.getElementById('sgErr'); if(e) e.remove();
+  document.getElementById('suggestModal').classList.remove('hidden');
+  document.getElementById('sgName').focus();
+}
+function closeSuggest(){ document.getElementById('suggestModal').classList.add('hidden'); }
+
+function submitSuggest(){
+  const name=document.getElementById('sgName').value.trim();
+  const group=document.getElementById('sgGroup').value.trim();
+  const hp=document.getElementById('sgHp').value;
+  const btn=document.getElementById('sgSubmit');
+  const showErr=(msg)=>{ let e=document.getElementById('sgErr'); if(!e){ e=document.createElement('p'); e.id='sgErr'; e.className='m-err'; btn.after(e);} e.textContent=msg; };
+  if(hp){ closeSuggest(); return; } // 허니팟(봇) → 조용히 종료
+  if(!name || !group){ showErr('이름과 그룹은 꼭 알려주세요 🙏'); return; }
+
+  // 소프트 레이트리밋 (브라우저 기준)
+  const last=+(localStorage.getItem('sg_last')||0), now=Date.now();
+  if(now-last < SUGGEST_COOLDOWN_MS){
+    const min=Math.ceil((SUGGEST_COOLDOWN_MS-(now-last))/60000);
+    showErr(`방금 제보해주셨어요. 약 ${min}분 뒤에 또 알려주세요 🙂`); return;
+  }
+
+  const payload={ name, group,
+    cat: document.getElementById('sgCat').value,
+    gender: document.getElementById('sgGender').value,
+    dob: document.getElementById('sgDob').value.replace(/\D/g,'').slice(0,8),
+    note: document.getElementById('sgNote').value.trim(), hp:"" };
+
+  const done=()=>{ localStorage.setItem('sg_last', String(Date.now()));
+    document.getElementById('suggestForm').classList.add('hidden');
+    document.getElementById('suggestDone').classList.remove('hidden'); };
+
+  if(!SUGGEST_ENDPOINT){ // 엔드포인트 미연결: 로컬 기록 후 감사 메시지(수집은 배포 후)
+    done(); return;
+  }
+  btn.disabled=true; btn.textContent='보내는 중…';
+  fetch(SUGGEST_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
+    .then(r=>{
+      if(r.status===429){ showErr('이미 최근에 제보하셨어요. 잠시 뒤 다시 시도해주세요 🙂'); return; }
+      if(!r.ok) throw new Error('bad');
+      done();
+    })
+    .catch(()=>showErr('앗, 잠깐 문제가 생겼어요. 잠시 후 다시 시도해주세요.'))
+    .finally(()=>{ btn.disabled=false; btn.textContent='제보 보내기'; });
+}
+
+function closeUpdate(){ document.getElementById('updatePopup').classList.add('hidden'); }
+
+// ================= 오류 제보 (기존 제보와 같은 Worker, type:"error") =================
+let _erTarget = { name:"", group:"" };
+function openError(nameEnc, groupEnc){
+  _erTarget = { name: decodeURIComponent(nameEnc), group: decodeURIComponent(groupEnc) };
+  document.getElementById('erTarget').textContent = `${_erTarget.name} · ${_erTarget.group}`;
+  document.getElementById('erForm').classList.remove('hidden');
+  document.getElementById('erDone').classList.add('hidden');
+  const e=document.getElementById('erErr'); if(e) e.remove();
+  document.getElementById('erField').value = '생년월일';
+  document.getElementById('erSuggest').value = '';
+  document.getElementById('erNote').value = '';
+  document.getElementById('errorModal').classList.remove('hidden');
+}
+function closeError(){ document.getElementById('errorModal').classList.add('hidden'); }
+function submitError(){
+  const btn=document.getElementById('erSubmit');
+  if(document.getElementById('erHp').value){ closeError(); return; } // 허니팟
+  const showErr=(msg)=>{ let e=document.getElementById('erErr'); if(!e){ e=document.createElement('p'); e.id='erErr'; e.className='m-err'; btn.after(e);} e.textContent=msg; };
+  // 소프트 레이트리밋 (추가 제보와 공유)
+  const last=+(localStorage.getItem('sg_last')||0), now=Date.now();
+  if(now-last < SUGGEST_COOLDOWN_MS){ const min=Math.ceil((SUGGEST_COOLDOWN_MS-(now-last))/60000); showErr(`방금 제보해주셨어요. 약 ${min}분 뒤에 또 알려주세요 🙂`); return; }
+  const payload={ type:"error", name:_erTarget.name, group:_erTarget.group,
+    field: document.getElementById('erField').value,
+    suggest: document.getElementById('erSuggest').value.trim(),
+    note: document.getElementById('erNote').value.trim(), hp:"" };
+  const done=()=>{ localStorage.setItem('sg_last', String(Date.now()));
+    document.getElementById('erForm').classList.add('hidden');
+    document.getElementById('erDone').classList.remove('hidden'); };
+  if(!SUGGEST_ENDPOINT){ done(); return; }
+  btn.disabled=true; btn.textContent='보내는 중…';
+  fetch(SUGGEST_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
+    .then(r=>{ if(r.status===429){ showErr('이미 최근에 제보하셨어요. 잠시 뒤 다시 시도해주세요 🙂'); return; } if(!r.ok) throw new Error('bad'); done(); })
+    .catch(()=>showErr('앗, 잠깐 문제가 생겼어요. 잠시 후 다시 시도해주세요.'))
+    .finally(()=>{ btn.disabled=false; btn.textContent='오류 신고 보내기'; });
+}
+
+// ===== 주간 최애 리포트 =====
+// 매칭할 때마다 전체 1위를 적립하고, 일주일 주기로 "내 최애 추천 이유"를 재밌게 보여준다.
+function logFav(top){
+  if(!top) return;
+  let log; try{ log = JSON.parse(localStorage.getItem('fav_log'))||[]; }catch(e){ log=[]; }
+  log.push({ name:top.name, group:top.group, role:top.role, reason:top.reason,
+             pct:top.pct, pillar:top.pillar, elem:top.elem, at:Date.now() });
+  const cut = Date.now() - 30*864e5;            // 최근 30일 + 최대 60건만 유지
+  localStorage.setItem('fav_log', JSON.stringify(log.filter(x=>x.at>=cut).slice(-60)));
+  if(!localStorage.getItem('fav_cycle_start')) localStorage.setItem('fav_cycle_start', String(Date.now()));
+}
+function closeFav(){ document.getElementById('favReport').classList.add('hidden'); }
+function maybeShowFavReport(){
+  const WEEK = 7*864e5;
+  const start = +(localStorage.getItem('fav_cycle_start')||0);
+  if(!start || Date.now()-start < WEEK) return false;   // 이력 없음 or 아직 일주일 전
+  let log; try{ log = JSON.parse(localStorage.getItem('fav_log'))||[]; }catch(e){ log=[]; }
+  const cycle = log.filter(x=>x.at>=start);
+  if(!cycle.length){ localStorage.setItem('fav_cycle_start', String(Date.now())); return false; }
+  // 최애 = 이 주기에 1위로 가장 자주 등장한 인물(동률이면 최고 궁합%)
+  const tally={};
+  cycle.forEach(x=>{ const k=x.name+'|'+x.group;
+    if(!tally[k]) tally[k]={...x, cnt:0};
+    tally[k].cnt++; if(x.pct>tally[k].pct) tally[k].pct=x.pct; });
+  const fav = Object.values(tally).sort((a,b)=> b.cnt-a.cnt || b.pct-a.pct)[0];
+  const total = cycle.length;
+  document.getElementById('favName').textContent   = `${fav.name} · ${fav.group}`;
+  document.getElementById('favRole').textContent   = fav.role || "";
+  document.getElementById('favReason').textContent = fav.reason || "";
+  document.getElementById('favLead').textContent   = total>1
+    ? `이번 주 ${total}번 매칭했는데요, 사주가 가장 자주 콕 집은 최애를 데려왔어요.`
+    : `이번 주 매칭에서 사주가 가장 강하게 밀어준 최애예요.`;
+  document.getElementById('favFoot').textContent =
+    (fav.cnt>1 ? `이번 주 ${total}번 중 ${fav.cnt}번 1위 · ` : '') + `최고 궁합 ${(+fav.pct).toFixed(1)}%`;
+  document.getElementById('favReport').classList.remove('hidden');
+  localStorage.setItem('fav_cycle_start', String(Date.now())); // 다음 주기 시작
+  return true;
+}
+
+// 배너 총원 + 업데이트 팝업(최근 3일 추가분만) + 주간 최애 리포트
+(function initReportUI(){
+  const favShown = maybeShowFavReport();  // 개인 리포트 우선
+  fetch('tools/stats.json?t='+Date.now()).then(r=>r.json()).then(st=>{
+    if(st && st.total){ const c=document.getElementById('rbCount'); if(c) c.textContent=`지금 ${st.total.toLocaleString()}명과 함께하고 있어요`; }
+    const rec = Array.isArray(st.addedRecent) ? st.addedRecent : [];
+    const cut = Date.now() - 3*24*60*60*1000; // 최근 3일
+    const fresh = rec.filter(x=>{ const t=Date.parse((x.date||'').replace(/\./g,'-')); return !isNaN(t) && t>=cut; });
+    if(!fresh.length) return;
+    // 마지막으로 본 업데이트 이후 새 게 있을 때만
+    const latest = fresh.map(x=>x.date).sort().pop();
+    if(localStorage.getItem('upd_seen')===latest) return;
+    if(favShown) return;                       // 최애 리포트가 떴으면 겹치지 않게 이번엔 생략
+    const list=document.getElementById('upList');
+    list.innerHTML = fresh.map(x=>`<div class="up-item"><span class="up-date">${(x.date||'').replace(/-/g,'.')}</span><span class="up-text">${x.text||''}</span></div>`).join("");
+    const n = fresh.reduce((s,x)=>s+(x.count||0),0);
+    document.getElementById('upLead').textContent = n ? `요 며칠 사이 ${n}명이 새로 합류했어요. 혹시 찾던 그 사람일지도 몰라요.` : '새 얼굴이 도착했어요. 혹시 찾던 그 사람일지도 몰라요.';
+    document.getElementById('updatePopup').classList.remove('hidden');
+    localStorage.setItem('upd_seen', latest);
+  }).catch(()=>{});
+})();
+</script>
+</body>
+</html>

@@ -37,7 +37,7 @@
 1. Repository **Settings → Pages**
 2. **Source** → `Deploy from a branch`
 3. **Branch** → `claude/idol-saju-matching-app-752fy3` / `/(root)` → **Save**
-4. 1~2분 뒤 <https://alfira0526.github.io/saju-idol-match/> 에서 공개
+4. 1~2분 뒤 <https://ychan311297-kyc.github.io/saju-idol-match/> 에서 공개
 
 이후에는 브랜치에 push할 때마다 자동으로 갱신됩니다.
 

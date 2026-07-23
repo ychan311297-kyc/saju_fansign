@@ -80,7 +80,7 @@ tools/idols.json
 8자리 숫자로 입력합니다.
 
 ```text
-19961221
+19971231
 ```
 
 ### 태어난 시각
@@ -88,7 +88,7 @@ tools/idols.json
 선택 입력입니다.
 
 ```text
-10:21
+09:55
 ```
 
 시간을 입력하지 않으면 시주 궁합은 중립점수 60으로 계산합니다.
@@ -218,14 +218,7 @@ tools/idols.json
 
 ```json
 [
-  {
-    "name": "강유찬",
-    "group": "A.C.E",
-    "agency": "기타",
-    "gender": "M",
-    "dob": "1997-12-31",
-    "cat": "K-idol"
-  }
+  {    "name": "강유찬",    "group": "A.C.E",    "agency": "기타",    "gender": "M",    "dob": "1997-12-31",    "cat": "K-idol"  }
 ]
 ```
 
